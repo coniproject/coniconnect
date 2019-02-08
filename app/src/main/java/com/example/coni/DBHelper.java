@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.sql.Date;
+
 public class DBHelper extends SQLiteOpenHelper {
 
     //Database Name and Table Name
@@ -63,28 +65,28 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE "+guardianDetailModel+" ( " +
                 ""+G_ID_COL1+" integer primary key autoincrement, "
-                +G_LASTNAME_COL2+" text , "
-                +G_FIRSTNAME_COL3+" text, "
+                +G_LASTNAME_COL2+" text not null, "
+                +G_FIRSTNAME_COL3+" text not null, "
                 +G_MIDNAME_COL4+" text, "
-                +G_AGE_COL5+" integer , "
-                +G_BIRTHDAY_COL6+" date , "
-//                +G_GENDER_COL7+" text , "
-                +G_CONTACTNO_COL8+" integer , "
+                +G_AGE_COL5+" integer not null, "
+                +G_BIRTHDAY_COL6+" date not null, "
+                +G_GENDER_COL7+" text not null, "
+                +G_CONTACTNO_COL8+" integer unique not null, "
                 +G_EMAIL_COL9+" text unique, "
                 +G_UNAME_COL10+" text unique, "
-                +G_PASSWORD_COL10+" text);");
+                +G_PASSWORD_COL10+" text not null);");
 
         Log.e("Table Operations :", "Guardian Detail Created");
 
         db.execSQL("CREATE TABLE "+childDetailModel+" ( " +
                 ""+C_ID_COL1+" integer primary key autoincrement, "
-                +C_LASTNAME_COL2+" text, "
-                +C_FIRSTNAME_COL3+" text, "
+                +C_LASTNAME_COL2+" text not null, "
+                +C_FIRSTNAME_COL3+" text not null, "
                 +C_MIDDLENAME_COL4+" text, "
-                +C_AGE_COL5+" text, "
-                +C_BIRTHDAY_COL6+" text, "
-                +C_GENDER_COL7+" text, "
-                +C_PHOTO_COL8+");");
+                +C_AGE_COL5+" text not null, "
+                +C_BIRTHDAY_COL6+" text not null, "
+                +C_GENDER_COL7+" text not null, "
+                +C_PHOTO_COL8+" not null);");
 
         Log.e("Table Operations :", "Child Detail Created");
 
@@ -115,15 +117,15 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //Insert --> Guardian Registration
 
-    public boolean addguardian(String lastname, String firstname, String midname, String age,String contactno, String email, String uname, String pass) {
+    public boolean addguardian(String lastname, String firstname, String midname, String age, String bday, String gender, String contactno, String email, String uname, String pass) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(G_LASTNAME_COL2, lastname);
         contentValues.put(G_FIRSTNAME_COL3, firstname);
         contentValues.put(G_MIDNAME_COL4, midname);
         contentValues.put(G_AGE_COL5, age);
-//        contentValues.put(G_BIRTHDAY_COL6, bday);
-//        contentValues.put(G_GENDER_COL7, gender);
+        contentValues.put(G_BIRTHDAY_COL6, bday);
+        contentValues.put(G_GENDER_COL7, gender);
         contentValues.put(G_CONTACTNO_COL8, contactno);
         contentValues.put(G_EMAIL_COL9, email);
         contentValues.put(G_UNAME_COL10, uname);
@@ -138,17 +140,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean addGuardianGender(String selectedGender) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(G_GENDER_COL7,selectedGender);
-        long result = db.insert(guardianDetailModel, null, contentValues);
-        if (result == -1)
-            return false;
-        else
-            return true;
-
-    }
+//    public boolean addGuardianGender(String selectedGender) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(G_GENDER_COL7,selectedGender);
+//        long result = db.insert(guardianDetailModel, null, contentValues);
+//        if (result == -1)
+//            return false;
+//        else
+//            return true;
+//
+//    }
 
     //Insert --> Child Registration
 
@@ -176,9 +178,21 @@ public class DBHelper extends SQLiteOpenHelper {
     //Cursors : Responsible for searching data requirements
 
     public Cursor userlogin(String loginame, String loginpword, SQLiteDatabase db){
-        String query = "select * from guardianDetails where username = '"+loginame+"' and password = '"+loginpword+"'";
+        String query = "select * from guardianDetails where username = '"+loginame+"' and password = '"+loginpword+"' ";
         Log.d("query", query);
         Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
+    public Cursor usernameValidation(String valusername, SQLiteDatabase db) {
+        String query = "select * from guardianDetails where username = '"+valusername+"' ";
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
+    public Cursor emailValidation(String valemail, SQLiteDatabase db) {
+        String query = "select * from guardianDetails where email ='"+valemail+"' ";
+        Cursor cursor = db.rawQuery(query,null);
         return cursor;
     }
 

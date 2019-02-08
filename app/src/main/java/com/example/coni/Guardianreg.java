@@ -3,12 +3,17 @@ package com.example.coni;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -24,6 +29,7 @@ public class Guardianreg extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     DBHelper mydb;
+    SQLiteDatabase sqLiteDatabase;
 
     EditText edtlastname, edtfirstname,
             edtmidname, edtage,
@@ -42,12 +48,16 @@ public class Guardianreg extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guardianreg);
+
 
         mydb = new DBHelper(this);
 
         edtlastname =  findViewById(R.id.editlastname);
+        edtlastname.requestFocus();
         edtfirstname = findViewById(R.id.editfirstname);
         edtmidname = findViewById(R.id.editmidname);
         edtage = findViewById(R.id.editage);
@@ -62,54 +72,46 @@ public class Guardianreg extends AppCompatActivity {
         txtbday=findViewById(R.id.txtbday);
         rdbgender = findViewById(R.id.rdbgroupgender);
 
-        edtlastname.requestFocus();
-
-
-        rdbgender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                int id= rdbgender.getCheckedRadioButtonId();
-
-                RadioButton rb= findViewById(checkedId);
-
-                String radioText =rb.getText().toString();
-                mydb.addGuardianGender(radioText);
-            }
-
-
-        });
 
 
         btnsignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+//                //Radio Button
+//
+//                int checkRadioID = rdbgender.getCheckedRadioButtonId();
+//                RadioButton selectedGender = findViewById(checkRadioID);
 
-                boolean isInserted = mydb.addguardian(
-                        edtlastname.getText().toString(),
-                        edtfirstname.getText().toString(),
-                        edtmidname.getText().toString(),
-                        edtage.getText().toString(),
+                //validation
+                validation();
+
+//                boolean isInserted = mydb.addguardian(
+//                        edtlastname.getText().toString(),
+//                        edtfirstname.getText().toString(),
+//                        edtmidname.getText().toString(),
+//                        edtage.getText().toString(),
 //                        txtbday.getText().toString(),
 //                        selectedGender.getText().toString(),
-                        edtcontactno.getText().toString(),
-                        edtemail.getText().toString(),
-                        edtuname.getText().toString(),
-                        edtpass.getText().toString());
+//                        edtcontactno.getText().toString(),
+//                        edtemail.getText().toString(),
+//                        edtuname.getText().toString(),
+//                        edtpass.getText().toString());
+//
+//
+//                if (isInserted) {
+//                    Toast.makeText(Guardianreg.this, "Registered", Toast.LENGTH_SHORT).show();
+//                    Intent toLogin = new Intent(Guardianreg.this, UserLogin.class);
+//                    startActivity(toLogin);
+//                }
+//                else{
+//                    Toast.makeText(Guardianreg.this, "Please fill up all the required fields.", Toast.LENGTH_SHORT).show();
+//                }
 
-
-
-
-                if (isInserted) {
-                    Toast.makeText(Guardianreg.this, "Registered", Toast.LENGTH_SHORT).show();
-                    Intent toLogin = new Intent(Guardianreg.this, UserLogin.class);
-                    startActivity(toLogin);
-                }
-                else {
-                    Toast.makeText(Guardianreg.this, "Please fill up all the required fields.", Toast.LENGTH_SHORT).show();
-                }
             }
         });
+
+
 
         //DateTimePicker
 
@@ -133,7 +135,6 @@ public class Guardianreg extends AppCompatActivity {
             }
         });
 
-
         mDateSetListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
@@ -144,5 +145,93 @@ public class Guardianreg extends AppCompatActivity {
                 txtbday.setText(date);
             }
         };
+
+    }
+
+    public void validation() {
+
+        String valusername = edtuname.getText().toString();
+        String valpass = edtpass.getText().toString();
+        String valconfirmpass = confirmpword.getText().toString();
+        String valemail = edtemail.getText().toString();
+        String valcontactno = edtcontactno.getText().toString();
+
+        sqLiteDatabase = mydb.getReadableDatabase();
+        Cursor res = mydb.usernameValidation(valusername, sqLiteDatabase);
+        Cursor emailres = mydb.emailValidation(valemail, sqLiteDatabase);
+
+        //Username
+        if(!res.moveToFirst()) {
+           res.close();
+        }
+        else {
+            edtuname.setError("Username Taken.");
+            edtuname.setText("");
+        }
+        //Password
+
+        if(valpass.length() > 6) {
+
+            if(!valpass.equals(valconfirmpass)) {
+                edtpass.setError("Passwords do not match.");
+                edtpass.setText("");
+            }
+            else {
+
+                //Radio Button
+
+                int checkRadioID = rdbgender.getCheckedRadioButtonId();
+                RadioButton selectedGender = findViewById(checkRadioID);
+
+                boolean isInserted = mydb.addguardian(
+                        edtlastname.getText().toString(),
+                        edtfirstname.getText().toString(),
+                        edtmidname.getText().toString(),
+                        edtage.getText().toString(),
+                        txtbday.getText().toString(),
+                        selectedGender.getText().toString(),
+                        edtcontactno.getText().toString(),
+                        edtemail.getText().toString(),
+                        edtuname.getText().toString(),
+                        edtpass.getText().toString());
+
+
+                if (isInserted) {
+                    Toast.makeText(Guardianreg.this, "Registered", Toast.LENGTH_SHORT).show();
+                    Intent toLogin = new Intent(Guardianreg.this, UserLogin.class);
+                    startActivity(toLogin);
+
+                    edtlastname.setText("");
+                    edtfirstname.setText("");
+                    edtmidname.setText("");
+                    edtemail.setText("");
+                    edtuname.setText("");
+                    edtcontactno.setText("");
+                    edtpass.setText("");
+                    edtgender.setText("");
+                    edtbday.setText("");
+                }
+                else{
+                    Toast.makeText(Guardianreg.this, "Please fill up all the required fields.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        else {
+            edtpass.setError("Minimum 6 Characters");
+        }
+
+
+        //Email
+
+        if(!emailres.moveToFirst()) {
+           emailres.close();
+        } else {
+            edtemail.setError("Email Address already exists.");
+            edtemail.setText("");
+        }
+
+
+
+
     }
 }

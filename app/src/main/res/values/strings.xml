@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">CONi: Connecting Families</string>
     <string name="login">Login</string>
     <string name="signup">Signup</string>
     <string name="lastname">Last Name</string>
@@ -14,4 +15,5 @@
     <string name="username">Username</string>
     <string name="Password">Password</string>
     <string name="confirmpass">Confirm Password</string>
+    <string name="Username">Username</string>
 </resources>

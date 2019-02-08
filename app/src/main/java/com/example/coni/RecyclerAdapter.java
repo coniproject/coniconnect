@@ -37,7 +37,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter <RecyclerAdapter.MyVie
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         mLayoutInflater = LayoutInflater.from(context);
-        View view = mLayoutInflater.inflate(R.layout.activity_child_list_display, parent, false);
+        View view = mLayoutInflater.inflate(R.layout.activity_child_list, parent, false);
         MyViewHolder mHolder = new MyViewHolder(view);
 
         return mHolder;

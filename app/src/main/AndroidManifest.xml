@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MapView"></activity>
-        <activity android:name=".ChildList" />
+        <activity android:name=".ChildList"/>
         <activity android:name=".Guardianreg" />
         <activity android:name=".UserLogin" />
         <activity android:name=".MainActivity">

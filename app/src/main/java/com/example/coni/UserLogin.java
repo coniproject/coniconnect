@@ -50,6 +50,8 @@ public class UserLogin extends AppCompatActivity {
                     startActivity(intent);
 
                     Toast.makeText(UserLogin.this, "Signed in.", Toast.LENGTH_SHORT).show();
+                    txtusername.setText("");
+                    txtpassword.setText("");
                 } else {
                     Toast.makeText(UserLogin.this, "Username and password do not match.", Toast.LENGTH_LONG).show();
                     txtusername.setText("");
@@ -60,4 +62,5 @@ public class UserLogin extends AppCompatActivity {
             }
         });
     }
+
 }
