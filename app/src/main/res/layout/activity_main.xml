@@ -43,7 +43,7 @@
             android:gravity="center"
             android:text="@string/signup"
             android:textSize="20sp"
-            android:textColor="@color/color3"
+            android:textColor="@color/color4"
             android:fontFamily="@font/phagspa"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"/>

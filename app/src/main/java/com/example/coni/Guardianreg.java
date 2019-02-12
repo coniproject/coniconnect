@@ -77,37 +77,7 @@ public class Guardianreg extends AppCompatActivity {
         btnsignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-//                //Radio Button
-//
-//                int checkRadioID = rdbgender.getCheckedRadioButtonId();
-//                RadioButton selectedGender = findViewById(checkRadioID);
-
-                //validation
                 validation();
-
-//                boolean isInserted = mydb.addguardian(
-//                        edtlastname.getText().toString(),
-//                        edtfirstname.getText().toString(),
-//                        edtmidname.getText().toString(),
-//                        edtage.getText().toString(),
-//                        txtbday.getText().toString(),
-//                        selectedGender.getText().toString(),
-//                        edtcontactno.getText().toString(),
-//                        edtemail.getText().toString(),
-//                        edtuname.getText().toString(),
-//                        edtpass.getText().toString());
-//
-//
-//                if (isInserted) {
-//                    Toast.makeText(Guardianreg.this, "Registered", Toast.LENGTH_SHORT).show();
-//                    Intent toLogin = new Intent(Guardianreg.this, UserLogin.class);
-//                    startActivity(toLogin);
-//                }
-//                else{
-//                    Toast.makeText(Guardianreg.this, "Please fill up all the required fields.", Toast.LENGTH_SHORT).show();
-//                }
-
             }
         });
 
@@ -208,7 +178,6 @@ public class Guardianreg extends AppCompatActivity {
                     edtuname.setText("");
                     edtcontactno.setText("");
                     edtpass.setText("");
-                    edtgender.setText("");
                     edtbday.setText("");
                 }
                 else{

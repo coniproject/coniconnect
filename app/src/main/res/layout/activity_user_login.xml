@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".UserLogin"
-    background="#FFF9C4"
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/coniplain">
@@ -29,7 +28,7 @@
                 android:layout_marginTop="150dp"
                 android:layout_marginBottom="48dp"
                 android:ems="10"
-                android:textColor="@color/color3"
+                android:textColor="@color/color4"
                 android:hint="@string/Username"
                 android:inputType="textPersonName" />
 
@@ -40,7 +39,7 @@
                 android:layout_marginBottom="196dp"
                 android:ems="10"
                 android:hint="@string/Password"
-                android:textColor="@color/color3"
+                android:textColor="@color/color4"
                 android:inputType="textPassword" />
 
 
@@ -66,7 +65,7 @@
             android:background="@drawable/round"
             android:textSize="20sp"
             android:layout_marginBottom="50dp"
-            android:textColor="@color/color3"
+            android:textColor="@color/color4"
             android:text="@string/login"
 
             />

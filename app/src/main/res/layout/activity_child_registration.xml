@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Guardianreg"
-    android:orientation="vertical"
-    android:gravity="center"
+    tools:context=".ChildRegistration"
     android:background="@drawable/coniplain">
 
     <ScrollView
@@ -22,18 +20,25 @@
             <!-- Add CONi icon here -->
 
 
+            <ImageView
+                android:id="@+id/imgchild"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:contentDescription="@string/childimg"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/addimgicon"/>
             <EditText
-                android:id="@+id/editlastname"
+                android:id="@+id/editclastname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20sp"
+                android:layout_marginTop="10sp"
                 android:ems="10"
                 android:hint="@string/lastname"
                 android:inputType="textPersonName" />
 
 
             <EditText
-                android:id="@+id/editfirstname"
+                android:id="@+id/editcfirstname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5sp"
@@ -42,7 +47,7 @@
                 android:inputType="textPersonName" />
 
             <EditText
-                android:id="@+id/editmidname"
+                android:id="@+id/editcmidname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5sp"
@@ -52,7 +57,7 @@
 
 
             <EditText
-                android:id="@+id/editage"
+                android:id="@+id/editcage"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_marginTop="5sp"
@@ -64,25 +69,24 @@
                 />
 
             <TextView
-                android:id="@+id/txtbday"
+                android:id="@+id/txtcbday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="18dp"
-                android:layout_marginTop="5sp"
+                android:layout_marginTop="10sp"
                 android:layout_marginBottom="15dp"
-                android:ems="10"
+                android:ems="8"
                 android:hint="@string/birthdate"
                 android:textSize="20dp" />
 
 
             <RadioGroup
-                android:id="@+id/rdbgroupgender"
+                android:id="@+id/rdbcgender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
 
                 <RadioButton
-                    android:id="@+id/rdmale"
+                    android:id="@+id/rdcmale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="false"
@@ -90,7 +94,7 @@
                     android:text="@string/radio_male" />
 
                 <RadioButton
-                    android:id="@+id/rdfem"
+                    android:id="@+id/rdcfem"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ems="10"
@@ -99,60 +103,41 @@
             </RadioGroup>
 
 
+
             <EditText
-                android:id="@+id/editcontactnumber"
+                android:id="@+id/editdeviceno"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5sp"
                 android:ems="10"
-                android:hint="@string/contactno"
-                android:maxLength="11"
-                android:inputType="phone" />
+                android:hint="@string/Deviceno"
+                android:inputType="text" />
 
-            <EditText
-                android:id="@+id/editemail"
+            <RadioGroup
+                android:id="@+id/rdbTermsCon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5sp"
-                android:ems="10"
-                android:hint="@string/email"
-                android:inputType="textEmailAddress" />
+                android:layout_gravity="center_horizontal">
 
-            <EditText
-                android:id="@+id/editusername"
+            <RadioButton
+                android:id="@+id/rdTerms"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5sp"
-                android:ems="10"
-                android:hint="@string/username"
-                android:inputType="textPersonName" />
+                android:checked="false"
+                android:ems="20"
+                android:text="@string/termsofcon"
+                android:layout_marginTop="20dp"
+                android:layoutDirection="ltr"/>
 
-            <EditText
-                android:id="@+id/editpassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5sp"
-                android:ems="10"
-                android:hint="@string/Password"
-                android:inputType="textPassword" />
-
-            <EditText
-                android:id="@+id/editconfirmpass"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10sp"
-                android:layout_marginBottom="10dp"
-                android:ems="10"
-                android:hint="@string/confirmpass"
-                android:inputType="textPassword" />
+            </RadioGroup>
 
             <Button
-                android:id="@+id/btn_signup"
+                android:id="@+id/btn_reg"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/round"
-                android:text="@string/signup"
+                android:text="@string/register"
                 android:textColor="@color/color4"
                 android:layout_marginBottom="20dp"
                 android:textSize="20sp" />
@@ -161,7 +146,6 @@
         </LinearLayout>
 
     </ScrollView>
-
 
 
 </LinearLayout>

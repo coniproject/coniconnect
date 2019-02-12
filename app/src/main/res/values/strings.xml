@@ -16,4 +16,10 @@
     <string name="Password">Password</string>
     <string name="confirmpass">Confirm Password</string>
     <string name="Username">Username</string>
+    <string name="Deviceno">Input Device Number</string>
+    <string name="termsofcon">By using the application and device, you accept and agree with our Privacy Policy and Terms of Use.</string>
+    <string name="childimg">Upload Photo or Take a Photo</string>
+    <string name="register">Register</string>
+    <string name="takephoto">Take a Photo</string>
+    <string name="opengallery">Choose from Gallery</string>
 </resources>

@@ -1,14 +1,19 @@
 package com.example.coni;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 public class UserLogin extends AppCompatActivity {
 
@@ -17,6 +22,8 @@ public class UserLogin extends AppCompatActivity {
 
     DBHelper mydb;
     SQLiteDatabase sqLiteDatabase;
+
+    private static final int ERROR_DIALOG_REQUEST = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +38,10 @@ public class UserLogin extends AppCompatActivity {
 
         mydb = new DBHelper(this);
         login();
+
+        //Map Access
+
+
 
     }
 
@@ -48,6 +59,7 @@ public class UserLogin extends AppCompatActivity {
                 if (res.moveToFirst()) {
                     Intent intent = new Intent(UserLogin.this, MapView.class);
                     startActivity(intent);
+
 
                     Toast.makeText(UserLogin.this, "Signed in.", Toast.LENGTH_SHORT).show();
                     txtusername.setText("");
