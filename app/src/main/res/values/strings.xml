@@ -22,4 +22,6 @@
     <string name="register">Register</string>
     <string name="takephoto">Take a Photo</string>
     <string name="opengallery">Choose from Gallery</string>
+    <string name="acctset">Account Settings</string>
+    <string name="logout">Log Out</string>
 </resources>

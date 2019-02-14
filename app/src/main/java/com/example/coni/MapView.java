@@ -2,9 +2,11 @@ package com.example.coni;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,7 +14,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,10 +54,24 @@ public class MapView extends AppCompatActivity {
     private DrawerLayout mDrawerlayout;
     private ActionBarDrawerToggle mToggle;
 
+    //Floating Action Button
+
+    boolean isOpen = false;
+
+    FloatingActionButton fab_menu, fab_settings,
+                        fab_home,fab_hotline,fab_zones,
+                        fab_reg,fab_logout, fab_update;
+
+    Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.conilogo);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_map_view);
 
 
@@ -61,14 +81,88 @@ public class MapView extends AppCompatActivity {
         }
 
         getLocationPermission();
+
+        fab_menu = findViewById(R.id.fab_nav);
+        fab_settings = findViewById(R.id.fab_settings);
+        fab_home = findViewById(R.id.fab_maphome);
+        fab_hotline = findViewById(R.id.fab_hotline);
+        fab_zones = findViewById(R.id.fab_safezone);
+        fab_reg = findViewById(R.id.fab_addmember);
+//        fab_logout = findViewById(R.id.fab_logout);
+        fab_update = findViewById(R.id.fab_update);
+
+        FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
+        FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
+        FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlock);
+
+        fab_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(isOpen) {
+                    fab_settings.startAnimation(FabClose);
+                    fab_home.startAnimation(FabClose);
+                    fab_hotline.startAnimation(FabClose);
+                    fab_zones.startAnimation(FabClose);
+                    fab_reg.startAnimation(FabClose);
+                    fab_update.startAnimation(FabClose);
+                    fab_menu.startAnimation(FabRotateAntiCW);
+
+                    fab_settings.setClickable(false);
+                    fab_home.setClickable(false);
+                    fab_hotline.setClickable(false);
+                    fab_zones.setClickable(false);
+                    fab_reg.setClickable(false);
+                    fab_update.setClickable(false);
+                    isOpen = false;
+
+                } else {
+                    fab_settings.startAnimation(FabOpen);
+                        fab_home.startAnimation(FabOpen);
+                        fab_hotline.startAnimation(FabOpen);
+                        fab_zones.startAnimation(FabOpen);
+                        fab_reg.startAnimation(FabOpen);
+//                        fab_logout.startAnimation(FabOpen);
+                        fab_update.startAnimation(FabOpen);
+                        fab_menu.startAnimation(FabRotateCW);
+
+                    fab_settings.setClickable(true);
+                    fab_home.setClickable(true);
+                    fab_hotline.setClickable(true);
+                    fab_zones.setClickable(true);
+                    fab_reg.setClickable(true);
+//                    fab_logout.setClickable(true);
+                    fab_update.setClickable(true);
+                    isOpen = true;
+                }
+
+
+            }
+        });
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
 
-        if(mToggle.onOptionsItemSelected(item)) {
-            return true;
+//        if(mToggle.onOptionsItemSelected(item)) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.menu_acctset:
+                //INsert Intent
+                break;
+
+            case R.id.menu_logout:
+                Intent toMain = new Intent(MapView.this,MainActivity.class);
+                startActivity(toMain);
+                Toast.makeText(MapView.this, "Disconnected.", Toast.LENGTH_SHORT).show();
+                break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
     private void init() {
@@ -202,5 +296,34 @@ public class MapView extends AppCompatActivity {
 
     }
 
+    //MENU NAVBAR
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    //ON ITEMS SELECTED
+
+
+//    @Override
+//    public boolean onContextItemSelected(MenuItem item) {
+//
+//        int id = item.getItemId();
+//
+//        switch (id) {
+//            case R.id.menu_acctset:
+//                //INsert Intent
+//                break;
+//
+//            case R.id.menu_logout:
+//                Intent toMain = new Intent(MapView.this,MainActivity.class);
+//                startActivity(toMain);
+//                Toast.makeText(MapView.this, "Disconnected.", Toast.LENGTH_SHORT).show();
+//                break;
+//        }
+//        return true;
+//    }
 }

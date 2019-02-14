@@ -124,7 +124,7 @@ public class Guardianreg extends AppCompatActivity {
         String valpass = edtpass.getText().toString();
         String valconfirmpass = confirmpword.getText().toString();
         String valemail = edtemail.getText().toString();
-        String valcontactno = edtcontactno.getText().toString();
+//        String valcontactno = edtcontactno.getText().toString();
 
         sqLiteDatabase = mydb.getReadableDatabase();
         Cursor res = mydb.usernameValidation(valusername, sqLiteDatabase);

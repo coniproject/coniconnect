@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -156,19 +157,46 @@ public class ChildRegistration extends AppCompatActivity {
     //ADD CHILD DATA
 
     public void ChildDataValidation(){
-        final String lastname = edtclastname.getText().toString();
-        final String firstname = edtcfirstname.getText().toString();
-        final String midname = edtcmidname.getText().toString();
-        final String age = edtcage.getText().toString();
-        final String bday = edtcbday.getText().toString();
-        final String gender = edtcgender.getText().toString();
-        final String deviceno = edtdeviceno.getText().toString();
-        final String termscon = rdtermscon.getText().toString();
+        final String vallastname = edtclastname.getText().toString();
+        final String valfirstname = edtcfirstname.getText().toString();
+        final String valmidname = edtcmidname.getText().toString();
+        final String valage = edtcage.getText().toString();
+        final String valbday = edtcbday.getText().toString();
+        final String valgender = edtcgender.getText().toString();
+        final String valdeviceno = edtdeviceno.getText().toString();
+        final String valtermscon = rdtermscon.getText().toString();
 
         final String imgdata = getBase64String(imgchild);
 
+        sqLiteDatabase = mydb.getReadableDatabase();
+        Cursor devres = mydb.deviceValidation(valdeviceno, sqLiteDatabase);
+
 
         //TO CODE VALIDATION NG KIDS
+
+        if(vallastname.isEmpty() && valfirstname.isEmpty() && valage.isEmpty() && valbday.isEmpty() && valgender.isEmpty()
+        && valdeviceno.isEmpty() && valtermscon.isEmpty() && imgdata.isEmpty()) {
+            Toast.makeText(ChildRegistration.this, "Please fill up all the required fields", Toast.LENGTH_SHORT).show();
+            edtclastname.requestFocus();
+            return;
+        }
+
+        if(devres.moveToFirst()) {
+            devres.close();
+        }
+        else {
+            edtdeviceno.setError("Device Number not found.");
+            edtdeviceno.setText("");
+        }
+
+
+        byte[] photo = getimagebyte(imgchild);
+
+        mydb.addchild(photo,vallastname,valfirstname, valmidname,valage,valbday,valgender);
+        Toast.makeText(ChildRegistration.this, "Child registered.", Toast.LENGTH_SHORT).show();
+        Intent toMap = new Intent(ChildRegistration.this, MapView.class);
+        startActivity(toMap);
+
 
     }
 
@@ -184,5 +212,11 @@ public class ChildRegistration extends AppCompatActivity {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
-    //TO UPLOAD IMAGE GANERN
+    public static byte[] getimagebyte (ImageView imageView){
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, stream);
+        byte [] bytearray = stream.toByteArray();
+        return bytearray;
+    }
 }

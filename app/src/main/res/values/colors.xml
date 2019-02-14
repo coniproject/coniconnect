@@ -6,4 +6,8 @@
     <color name="color1">#009245</color>
     <color name="color2">#493267</color>
     <color name="color4">#ffff</color>
+    <color  name="fab1_color">#9C27B0</color>
+    <color  name="fab2_color">#673AB7</color>
+    <!--<color  name="fab3_color">#673AB7</color>-->
+    <!--<color  name="fab4_color">#673AB7</color>-->
 </resources>

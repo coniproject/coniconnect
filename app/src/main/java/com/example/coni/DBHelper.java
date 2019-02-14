@@ -35,13 +35,13 @@ public class DBHelper extends SQLiteOpenHelper {
     //Table Child Columns
 
     public static final String C_ID_COL1 = "id";
-    public static final String C_LASTNAME_COL2 = "childlastname";
-    public static final String C_FIRSTNAME_COL3 = "childfirstname";
-    public static final String C_MIDDLENAME_COL4 = "childmidname";
-    public static final String C_AGE_COL5 = "childage";
-    public static final String C_BIRTHDAY_COL6 = "childbday";
-    public static final String C_GENDER_COL7 = "childgender";
-    public static final String C_PHOTO_COL8 = "childphonto";
+    public static final String C_PHOTO_COL2 = "childphoto";
+    public static final String C_LASTNAME_COL3 = "childlastname";
+    public static final String C_FIRSTNAME_COL4 = "childfirstname";
+    public static final String C_MIDDLENAME_COL5 = "childmidname";
+    public static final String C_AGE_COL6 = "childage";
+    public static final String C_BIRTHDAY_COL7 = "childbday";
+    public static final String C_GENDER_COL8 = "childgender";
 
     //Table Device Columns
 
@@ -80,13 +80,13 @@ public class DBHelper extends SQLiteOpenHelper {
 
         db.execSQL("CREATE TABLE "+childDetailModel+" ( " +
                 ""+C_ID_COL1+" integer primary key autoincrement, "
-                +C_LASTNAME_COL2+" text not null, "
-                +C_FIRSTNAME_COL3+" text not null, "
-                +C_MIDDLENAME_COL4+" text, "
-                +C_AGE_COL5+" text not null, "
-                +C_BIRTHDAY_COL6+" text not null, "
-                +C_GENDER_COL7+" text not null, "
-                +C_PHOTO_COL8+" not null);");
+                +C_PHOTO_COL2+"  not null, "
+                +C_LASTNAME_COL3+" text not null, "
+                +C_FIRSTNAME_COL4+" text not null, "
+                +C_MIDDLENAME_COL5+" text, "
+                +C_AGE_COL6+" text not null, "
+                +C_BIRTHDAY_COL7+" text not null, "
+                +C_GENDER_COL8+" text not null);");
 
         Log.e("Table Operations :", "Child Detail Created");
 
@@ -100,6 +100,13 @@ public class DBHelper extends SQLiteOpenHelper {
         // inserts a default user into the db //
         db.execSQL("insert into guardianDetails (lastname, firstname, middlename, age, birthday,gender, contactno, email, username, password) values " +
                 "('dela cruz', 'juan', 'jose', 33 , '1972-12-08', 'male', 09123456789 , 'juandelacruz@gmail.com', 'juandcruz' , 'testing1')");
+
+        db.execSQL("insert into deviceDetails(deviceno, devicestatus) values" +
+                "('A12345B','released')," +
+                "('A23456B','released')," +
+                "('A34567B','manufacturer')," +
+                "('A45678B','blocked')," +
+                "('A56789B','returned')");
     }
 
     @Override
@@ -154,16 +161,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     //Insert --> Child Registration
 
-    public boolean addchild(String clname, String cfname, String cmname, String cage, String cbday, String cgender, byte[]   cphoto) {
+    public boolean addchild(byte[] photo, String clname, String cfname, String cmname, String cage, String cbday, String cgender) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(C_LASTNAME_COL2, clname);
-        contentValues.put(C_FIRSTNAME_COL3, cfname);
-        contentValues.put(C_MIDDLENAME_COL4, cmname);
-        contentValues.put(C_AGE_COL5, cage);
-        contentValues.put(C_BIRTHDAY_COL6, cbday);
-        contentValues.put(C_GENDER_COL7, cgender);
-        contentValues.put(C_PHOTO_COL8, cphoto);
+        contentValues.put(C_PHOTO_COL2, photo);
+        contentValues.put(C_LASTNAME_COL3, clname);
+        contentValues.put(C_FIRSTNAME_COL4, cfname);
+        contentValues.put(C_MIDDLENAME_COL5, cmname);
+        contentValues.put(C_AGE_COL6, cage);
+        contentValues.put(C_BIRTHDAY_COL7, cbday);
+        contentValues.put(C_GENDER_COL8, cgender);
         Log.e("Table Operations : ", "Inserted One Child-Device User");
         long result = db.insert(childDetailModel, null, contentValues);
         if (result == -1)
@@ -195,6 +202,14 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query,null);
         return cursor;
     }
+
+    public Cursor deviceValidation(String valdeviceno, SQLiteDatabase db) {
+        String query = "select * from deviceDetails  where deviceno ='"+valdeviceno+"' and" +
+                " devicestatus = 'released' ";
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
+
 
 
 }

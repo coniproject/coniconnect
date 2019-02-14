@@ -1,4 +1,4 @@
-<android.support.v4.widget.DrawerLayout android:id="@+id/profilenav"
+<android.support.design.widget.CoordinatorLayout android:id="@+id/profilenav"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MapView"
@@ -9,15 +9,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--<android.support.design.widget.NavigationView-->
-    <!--android:id="@+id/navview"-->
-    <!--android:layout_height="match_parent"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:background="@color/white"-->
-    <!--app:itemTextColor="@color/menutextcolor"-->
-    <!--app:menu="@menu/drawermenu"-->
-    <!--android:layout_gravity="left">-->
-    <!--</android.support.design.widget.NavigationView>-->
 
 
     <ScrollView
@@ -52,7 +43,118 @@
         </LinearLayout>
 
 
-
     </ScrollView>
 
-</android.support.v4.widget.DrawerLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="16dp"
+            android:src="@drawable/menu"
+            android:elevation="6dp"
+            android:id="@+id/fab_nav"
+            app:pressedTranslationZ="12dp"
+            app:borderWidth="0dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="100dp"
+            android:src="@drawable/settings"
+            android:elevation="6dp"
+            android:id="@+id/fab_settings"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="180dp"
+            android:src="@drawable/adduser"
+            android:elevation="6dp"
+            android:id="@+id/fab_addmember"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="260dp"
+            android:src="@drawable/safezone"
+            android:elevation="6dp"
+            android:id="@+id/fab_safezone"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="330dp"
+            android:src="@drawable/exclamation"
+            android:elevation="6dp"
+            android:id="@+id/fab_update"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="400dp"
+            android:src="@drawable/hotlinesuggestions"
+            android:elevation="6dp"
+            android:id="@+id/fab_hotline"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+            <!--android:layout_marginBottom="180dp"-->
+            <!--android:src="@drawable/adduser"-->
+            <!--android:elevation="6dp"-->
+            <!--android:id="@+id/fab_register"-->
+            <!--app:pressedTranslationZ="12dp"-->
+            <!--android:backgroundTint="@color/fab2_color"-->
+            <!--android:visibility="invisible"-->
+            <!--app:borderWidth="0dp"/>-->
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|end"
+            android:layout_marginRight="@dimen/fab_margin_right"
+            android:layout_marginBottom="100dp"
+            android:src="@drawable/maphome"
+            android:elevation="6dp"
+            android:id="@+id/fab_maphome"
+            app:pressedTranslationZ="12dp"
+            android:backgroundTint="@color/fab2_color"
+            android:visibility="invisible"
+            app:borderWidth="0dp"/>
+
+
+</android.support.design.widget.CoordinatorLayout>
