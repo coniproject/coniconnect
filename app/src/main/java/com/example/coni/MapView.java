@@ -58,7 +58,7 @@ public class MapView extends AppCompatActivity {
 
     boolean isOpen = false;
 
-    FloatingActionButton fab_menu, fab_settings,
+    FloatingActionButton fab_menu, fab_nearby,
                         fab_home,fab_hotline,fab_zones,
                         fab_reg,fab_logout, fab_update;
 
@@ -83,7 +83,7 @@ public class MapView extends AppCompatActivity {
         getLocationPermission();
 
         fab_menu = findViewById(R.id.fab_nav);
-        fab_settings = findViewById(R.id.fab_settings);
+        fab_nearby = findViewById(R.id.fab_nearbyplaces);
         fab_home = findViewById(R.id.fab_maphome);
         fab_hotline = findViewById(R.id.fab_hotline);
         fab_zones = findViewById(R.id.fab_safezone);
@@ -101,7 +101,7 @@ public class MapView extends AppCompatActivity {
             public void onClick(View v) {
 
                 if(isOpen) {
-                    fab_settings.startAnimation(FabClose);
+                    fab_nearby.startAnimation(FabClose);
                     fab_home.startAnimation(FabClose);
                     fab_hotline.startAnimation(FabClose);
                     fab_zones.startAnimation(FabClose);
@@ -109,7 +109,7 @@ public class MapView extends AppCompatActivity {
                     fab_update.startAnimation(FabClose);
                     fab_menu.startAnimation(FabRotateAntiCW);
 
-                    fab_settings.setClickable(false);
+                    fab_nearby.setClickable(false);
                     fab_home.setClickable(false);
                     fab_hotline.setClickable(false);
                     fab_zones.setClickable(false);
@@ -118,7 +118,7 @@ public class MapView extends AppCompatActivity {
                     isOpen = false;
 
                 } else {
-                    fab_settings.startAnimation(FabOpen);
+                    fab_nearby.startAnimation(FabOpen);
                         fab_home.startAnimation(FabOpen);
                         fab_hotline.startAnimation(FabOpen);
                         fab_zones.startAnimation(FabOpen);
@@ -127,7 +127,7 @@ public class MapView extends AppCompatActivity {
                         fab_update.startAnimation(FabOpen);
                         fab_menu.startAnimation(FabRotateCW);
 
-                    fab_settings.setClickable(true);
+                    fab_nearby.setClickable(true);
                     fab_home.setClickable(true);
                     fab_hotline.setClickable(true);
                     fab_zones.setClickable(true);
@@ -137,9 +137,25 @@ public class MapView extends AppCompatActivity {
                     isOpen = true;
                 }
 
-
             }
         });
+
+        fab_reg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toChildReg = new Intent(MapView.this, ChildRegistration.class);
+                startActivity(toChildReg);
+            }
+        });
+
+        fab_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toHome = new Intent(MapView.this, MapView.class);
+                startActivity(toHome);
+            }
+        });
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -305,25 +321,4 @@ public class MapView extends AppCompatActivity {
         return true;
     }
 
-    //ON ITEMS SELECTED
-
-
-//    @Override
-//    public boolean onContextItemSelected(MenuItem item) {
-//
-//        int id = item.getItemId();
-//
-//        switch (id) {
-//            case R.id.menu_acctset:
-//                //INsert Intent
-//                break;
-//
-//            case R.id.menu_logout:
-//                Intent toMain = new Intent(MapView.this,MainActivity.class);
-//                startActivity(toMain);
-//                Toast.makeText(MapView.this, "Disconnected.", Toast.LENGTH_SHORT).show();
-//                break;
-//        }
-//        return true;
-//    }
 }

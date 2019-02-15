@@ -10,7 +10,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -18,8 +20,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -29,6 +34,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Calendar;
 
 public class ChildRegistration extends AppCompatActivity {
 
@@ -45,7 +51,7 @@ public class ChildRegistration extends AppCompatActivity {
 
     Button btnregister;
     RadioButton rdbcmale, rdbcfemale, rdtermscon;
-    RadioGroup rdbgender, rdbterms;
+    RadioGroup rdbcgender, rdbterms;
     TextView txtbday;
 
     Context context = this;
@@ -67,6 +73,7 @@ public class ChildRegistration extends AppCompatActivity {
         edtcmidname = findViewById(R.id.editcmidname);
         edtcage = findViewById(R.id.editcage);
         txtbday = findViewById(R.id.txtcbday);
+        rdbcgender = findViewById(R.id.rdbcgender);
         edtdeviceno = findViewById(R.id.editdeviceno);
         rdbterms = findViewById(R.id.rdbTermsCon);
 
@@ -107,12 +114,44 @@ public class ChildRegistration extends AppCompatActivity {
         });
 
 
+
         btnregister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ChildDataValidation();
             }
         });
+
+        txtbday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calendar cal = Calendar.getInstance();
+                int year = cal.get(Calendar.YEAR);
+                int month = cal.get(Calendar.MONTH);
+                int day = cal.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog dialog = new DatePickerDialog(
+                        ChildRegistration.this,
+                        android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                        mDateSetListener,
+                        year,month,day);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+
+            }
+        });
+
+        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                month = month + 1;
+//                Log.d(TAG, "onDateSet: mm/dd/yyy: " + month + "/" + day + "/" + year);
+
+                String date = month + "/" + day + "/" + year;
+                txtbday.setText(date);
+            }
+        };
+
     }
 
 
@@ -157,14 +196,18 @@ public class ChildRegistration extends AppCompatActivity {
     //ADD CHILD DATA
 
     public void ChildDataValidation(){
+
+        int checkRadioID = rdbcgender.getCheckedRadioButtonId();
+        RadioButton selectedGender = findViewById(checkRadioID);
+
         final String vallastname = edtclastname.getText().toString();
         final String valfirstname = edtcfirstname.getText().toString();
         final String valmidname = edtcmidname.getText().toString();
         final String valage = edtcage.getText().toString();
-        final String valbday = edtcbday.getText().toString();
-        final String valgender = edtcgender.getText().toString();
+        final String valbday = txtbday.getText().toString();
+        final String valgender = selectedGender.getText().toString();
         final String valdeviceno = edtdeviceno.getText().toString();
-        final String valtermscon = rdtermscon.getText().toString();
+//        final String valtermscon = rdtermscon.getText().toString();
 
         final String imgdata = getBase64String(imgchild);
 
@@ -175,7 +218,7 @@ public class ChildRegistration extends AppCompatActivity {
         //TO CODE VALIDATION NG KIDS
 
         if(vallastname.isEmpty() && valfirstname.isEmpty() && valage.isEmpty() && valbday.isEmpty() && valgender.isEmpty()
-        && valdeviceno.isEmpty() && valtermscon.isEmpty() && imgdata.isEmpty()) {
+        && valdeviceno.isEmpty()  && imgdata.isEmpty()) {
             Toast.makeText(ChildRegistration.this, "Please fill up all the required fields", Toast.LENGTH_SHORT).show();
             edtclastname.requestFocus();
             return;

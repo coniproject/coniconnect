@@ -199,8 +199,5 @@ public class Guardianreg extends AppCompatActivity {
             edtemail.setText("");
         }
 
-
-
-
     }
 }
