@@ -189,6 +189,22 @@ public class MapView extends AppCompatActivity {
             }
         });
 
+        fab_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toNearby = new Intent(MapView.this, NearbyPlaces.class);
+                startActivity(toNearby);
+            }
+        });
+
+        fab_hotline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toHotline = new Intent(MapView.this, Hotline.class);
+                startActivity(toHotline);
+            }
+        });
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
