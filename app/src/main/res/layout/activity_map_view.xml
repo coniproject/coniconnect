@@ -40,10 +40,26 @@
                 android:visibility="visible">
 
             </view>
+
+
         </LinearLayout>
 
 
     </ScrollView>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_gravity="center|bottom">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"/>
+
+    </ScrollView>
+
 
 
         <android.support.design.widget.FloatingActionButton

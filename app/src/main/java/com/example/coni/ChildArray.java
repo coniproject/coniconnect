@@ -3,23 +3,24 @@ package com.example.coni;
 public class ChildArray {
 
     private int id;
+    private byte[] child_photo;
     private String child_lname;
     private String child_fname;
     private String child_midname;
     private String child_age;
     private String child_birthday;
     private String child_gender;
-    private byte[] child_photo;
 
-    public ChildArray(int id, String child_lname, String child_fname, String child_midname, String child_age, String child_birthday, String child_gender, byte[] child_photo) {
+
+    public ChildArray(int id, byte[] child_photo, String child_lname, String child_fname, String child_midname, String child_age, String child_birthday, String child_gender) {
         this.id = id;
+        this.child_photo = child_photo;
         this.child_lname = child_lname;
         this.child_fname = child_fname;
         this.child_midname = child_midname;
         this.child_age = child_age;
         this.child_birthday = child_birthday;
         this.child_gender = child_gender;
-        this.child_photo = child_photo;
     }
 
     public int getId() {

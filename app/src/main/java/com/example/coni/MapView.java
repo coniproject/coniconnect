@@ -2,17 +2,23 @@ package com.example.coni;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,9 +39,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.sql.Array;
+import java.util.ArrayList;
+
 public class MapView extends AppCompatActivity {
 
-
+    Context context;
+    DBHelper mydb;
     private static final String TAG = "UserProfile";
     private static final int ERROR_DIALOG_REQUEST = 9001;
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -50,9 +60,6 @@ public class MapView extends AppCompatActivity {
     GoogleMap mGoogleMap;
     private static final float DEFAULT_ZOOM = 15f;
 
-    //layout
-    private DrawerLayout mDrawerlayout;
-    private ActionBarDrawerToggle mToggle;
 
     //Floating Action Button
 
@@ -63,6 +70,14 @@ public class MapView extends AppCompatActivity {
                         fab_reg,fab_logout, fab_update;
 
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
+
+    //RecyclerView - to inflate Child Details
+
+    RecyclerAdapter recyclerAdapter;
+    RecyclerView recyclerView;
+    private RecyclerView.LayoutManager mLayoutManage;
+    ArrayList<ChildArray> carray = new ArrayList<>();
+    SQLiteDatabase sqLiteDatabase;
 
 
 
@@ -76,9 +91,12 @@ public class MapView extends AppCompatActivity {
 
 
 
+
         if (checkGoogleServices()) {
             init();
         }
+
+
 
         getLocationPermission();
 
@@ -95,6 +113,21 @@ public class MapView extends AppCompatActivity {
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
         FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
         FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlock);
+
+        recyclerView = findViewById(R.id.recyclerView);
+
+        //RecyclerAdapter
+
+
+        mLayoutManage = new LinearLayoutManager(this);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(mLayoutManage);
+
+        DBHelper mydb = new DBHelper(this);
+        sqLiteDatabase = mydb.getReadableDatabase();
+
+//        refreshDataList();
+
 
         fab_menu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,5 +353,9 @@ public class MapView extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
+
+
+
+
 
 }

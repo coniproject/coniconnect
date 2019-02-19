@@ -67,6 +67,8 @@ public class ChildRegistration extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_child_registration);
 
+
+
         imgchild = findViewById(R.id.imgchild);
         edtclastname = findViewById(R.id.editclastname);
         edtcfirstname = findViewById(R.id.editcfirstname);
@@ -181,7 +183,7 @@ public class ChildRegistration extends AppCompatActivity {
             }
         }
         if (requestCode == CAPTURE_IMAGE && resultCode == RESULT_OK && imgdata != null) {
-            camImg =(Bitmap) imgdata.getExtras().get("img");
+            camImg =(Bitmap) imgdata.getExtras().get("data");
             try {
                 imgchild.setImageBitmap(camImg);
 
@@ -196,6 +198,8 @@ public class ChildRegistration extends AppCompatActivity {
     //ADD CHILD DATA
 
     public void ChildDataValidation(){
+
+        DBHelper mydb = new DBHelper(this);
 
         int checkRadioID = rdbcgender.getCheckedRadioButtonId();
         RadioButton selectedGender = findViewById(checkRadioID);

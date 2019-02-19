@@ -17,6 +17,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String guardianDetailModel = "guardianDetails";
     public static final String childDetailModel = "childDetails";
     public static final String deviceDetailModel = "deviceDetails";
+//    public static final String locationDetailModel = "locationDetails";
 
     //Table Guardian Columns
 
@@ -48,6 +49,13 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String D_IDNO_COL1 = "id";
     public static final String D_DEVICENO_COL2 = "deviceno";
     public static final String D_DEVSTATUS_COL3 = "devicestatus";
+
+    //Table Location Details
+//
+//    public static final String L_ID_COL1 = "id";
+//    public static final String L_BATT_STATUS = "battstatus";
+//    public static final String L_LAST_LOC = "lastloc";
+//    public static final String L_CURR_LOC = "currloc";
 
     //Database
 
@@ -97,6 +105,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         Log.e("Table Operations :", "Device Detail Created");
 
+
         // inserts a default user into the db //
         db.execSQL("insert into guardianDetails (lastname, firstname, middlename, age, birthday,gender, contactno, email, username, password) values " +
                 "('dela cruz', 'juan', 'jose', 33 , '1972-12-08', 'male', 09123456789 , 'juandelacruz@gmail.com', 'juandcruz' , 'testing1')");
@@ -107,6 +116,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 "('A34567B','manufacturer')," +
                 "('A45678B','blocked')," +
                 "('A56789B','returned')");
+
     }
 
     @Override
@@ -147,17 +157,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-//    public boolean addGuardianGender(String selectedGender) {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(G_GENDER_COL7,selectedGender);
-//        long result = db.insert(guardianDetailModel, null, contentValues);
-//        if (result == -1)
-//            return false;
-//        else
-//            return true;
-//
-//    }
 
     //Insert --> Child Registration
 
@@ -209,6 +208,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(query, null);
         return cursor;
     }
+
 
 
 
