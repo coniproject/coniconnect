@@ -24,4 +24,6 @@
     <string name="opengallery">Choose from Gallery</string>
     <string name="acctset">Account Settings</string>
     <string name="logout">Log Out</string>
+
+
 </resources>
