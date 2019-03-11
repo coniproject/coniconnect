@@ -21,12 +21,17 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDKNJyIaDzu7oRy84xqlVbOZ99-jCumD3g" />
-        <activity android:name=".ChildRegistration"></activity>
-        <activity android:name=".MapView" />
-        <activity android:name=".ChildList" />
-        <activity android:name=".Guardianreg" />
-        <activity android:name=".UserLogin" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".ChildRegistration"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
+        <activity android:name=".MapView"></activity>
+        <activity android:name=".ChildList"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".Guardianreg"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".UserLogin"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".MainActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

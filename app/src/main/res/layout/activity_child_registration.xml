@@ -26,8 +26,10 @@
                 android:layout_height="150dp"
                 android:contentDescription="@string/childimg"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/addimgicon"
-                android:scaleType="fitXY"/>
+                android:src="@drawable/baseline_add_a_photo_black_18dp"
+                android:padding="10dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/imageview_button"/>
             <EditText
                 android:id="@+id/editclastname"
                 android:layout_width="wrap_content"
@@ -137,7 +139,7 @@
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round"
+                android:background="@drawable/ripple_effect"
                 android:text="@string/register"
                 android:textColor="@color/color4"
                 android:layout_marginBottom="20dp"
