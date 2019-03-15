@@ -51,7 +51,12 @@ public class SmsReceiver extends BroadcastReceiver {
         String message = sms.getMessageBody();
         String[] separatedSMS = message.split("\\s+");
 
-        mydb.updateLocation(mydate,senderNumber,separatedSMS[1],separatedSMS[3]);
+        if(senderNumber.equals("+639179562277")) {
+            mydb.updateLocation(mydate,senderNumber,separatedSMS[1],separatedSMS[3]);
+
+            abortBroadcast();
+        }
+
 
 //        ContentValues values = new ContentValues();
 //        values.put("date", mydate);
