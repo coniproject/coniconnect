@@ -1,13 +1,20 @@
 package com.example.coni;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,8 +76,8 @@ public class MapView extends AppCompatActivity {
     boolean isOpen = false;
 
     FloatingActionButton fab_menu, fab_nearby,
-                        fab_home,fab_hotline,fab_zones,
-                        fab_reg,fab_logout, fab_update;
+            fab_home, fab_hotline, fab_zones,
+            fab_reg, fab_logout, fab_update;
 
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
 
@@ -81,26 +89,36 @@ public class MapView extends AppCompatActivity {
     ArrayList<ChildArray> carray = new ArrayList<>();
     SQLiteDatabase sqLiteDatabase;
 
+    //SMS
+
+    private static final int SMS_PERMISSION_CODE = 0;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setLogo(R.drawable.coniminilogo2);
-//        getSupportActionBar().setDisplayUseLogoEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setLogo(R.drawable.coniminilogo2);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_map_view);
-
-
 
 
         if (checkGoogleServices()) {
             init();
         }
 
+        if (!hasReadSmsPermission()) {
+            showRequestPermissionsInfoAlertDialog();
+        }
 
+//        BroadcastReceiver br = new SMSReceiver();
+//        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+//        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
+//        this.registerReceiver(br, filter);
 
+//        Intent intent = new Intent(view.getContext(), SMSReceiver.class);
+//        ContextCompat.startForegroundService(view.getContext(), intent);
         getLocationPermission();
 
         fab_menu = findViewById(R.id.fab_nav);
@@ -113,9 +131,9 @@ public class MapView extends AppCompatActivity {
         fab_update = findViewById(R.id.fab_update);
 
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
-        FabClose = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.fab_close);
-        FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_clockwise);
-        FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate_anticlock);
+        FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
+        FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
+        FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlock);
 
         recyclerView = findViewById(R.id.recyclerView);
 
@@ -136,7 +154,7 @@ public class MapView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(isOpen) {
+                if (isOpen) {
                     fab_nearby.startAnimation(FabClose);
                     fab_home.startAnimation(FabClose);
                     fab_hotline.startAnimation(FabClose);
@@ -155,13 +173,13 @@ public class MapView extends AppCompatActivity {
 
                 } else {
                     fab_nearby.startAnimation(FabOpen);
-                        fab_home.startAnimation(FabOpen);
-                        fab_hotline.startAnimation(FabOpen);
-                        fab_zones.startAnimation(FabOpen);
-                        fab_reg.startAnimation(FabOpen);
+                    fab_home.startAnimation(FabOpen);
+                    fab_hotline.startAnimation(FabOpen);
+                    fab_zones.startAnimation(FabOpen);
+                    fab_reg.startAnimation(FabOpen);
 //                        fab_logout.startAnimation(FabOpen);
-                        fab_update.startAnimation(FabOpen);
-                        fab_menu.startAnimation(FabRotateCW);
+                    fab_update.startAnimation(FabOpen);
+                    fab_menu.startAnimation(FabRotateCW);
 
                     fab_nearby.setClickable(true);
                     fab_home.setClickable(true);
@@ -210,7 +228,7 @@ public class MapView extends AppCompatActivity {
 
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
 
 //        if(mToggle.onOptionsItemSelected(item)) {
 //            return true;
@@ -225,7 +243,7 @@ public class MapView extends AppCompatActivity {
                 break;
 
             case R.id.menu_logout:
-                Intent toMain = new Intent(MapView.this,MainActivity.class);
+                Intent toMain = new Intent(MapView.this, MainActivity.class);
                 startActivity(toMain);
                 Toast.makeText(MapView.this, "Disconnected.", Toast.LENGTH_SHORT).show();
                 break;
@@ -327,39 +345,37 @@ public class MapView extends AppCompatActivity {
         });
     }
 
-    private void getDeviceLocation(){
+    private void getDeviceLocation() {
         Log.d(TAG, "Getting current location");
 
         mfusedlocationproviderclient = LocationServices.getFusedLocationProviderClient(this);
 
-        try{
-            if(mLocationPermissionGranted){
+        try {
+            if (mLocationPermissionGranted) {
                 Task location = mfusedlocationproviderclient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
                     public void onComplete(@NonNull Task task) {
-                        if(task.isSuccessful()) {
-                            Log.d(TAG,"getDeviceLocation: Location Found");
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "getDeviceLocation: Location Found");
                             Location currentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude()), DEFAULT_ZOOM);
-                        }
-                        else {
-                            Log.d(TAG,"No Location Found. Please allow location services.");
+                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()), DEFAULT_ZOOM);
+                        } else {
+                            Log.d(TAG, "No Location Found. Please allow location services.");
                             Toast.makeText(MapView.this, "Location not found.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
             }
 
-        }
-        catch (SecurityException e){
-            Log.d(TAG,"getDeviceLocation: Security Exception :" + e.getMessage());
+        } catch (SecurityException e) {
+            Log.d(TAG, "getDeviceLocation: Security Exception :" + e.getMessage());
         }
     }
 
     private void moveCamera(LatLng latlng, float zoom) {
-        Log.d(TAG,"Moving Location to lng : " + latlng.latitude + ", lng : " + latlng.longitude);
+        Log.d(TAG, "Moving Location to lng : " + latlng.latitude + ", lng : " + latlng.longitude);
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoom));
 
     }
@@ -373,8 +389,41 @@ public class MapView extends AppCompatActivity {
         return true;
     }
 
+//    SMS PERMISSIONS
 
+    private void showRequestPermissionsInfoAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.permission_alert_dialog_title);
+        builder.setMessage(R.string.permission_dialog_message);
+        builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                requestReadAndSendSmsPermission();
+            }
+        });
+        builder.show();
+    }
 
+    /**
+     * Runtime permission shenanigans
+     */
+    private boolean hasReadSmsPermission() {
+        return ContextCompat.checkSelfPermission(MapView.this,
+                Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(MapView.this,
+                        Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
 
+    private void requestReadAndSendSmsPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MapView.this, Manifest.permission.READ_SMS)) {
+            Log.d(TAG, "shouldShowRequestPermissionRationale(), no permission requested");
+            return;
+        }
+        ActivityCompat.requestPermissions(MapView.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS},
+                SMS_PERMISSION_CODE);
+    }
 
 }
+
+

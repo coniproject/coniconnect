@@ -5,9 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 public class DBHelper extends SQLiteOpenHelper {
 
@@ -17,7 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String guardianDetailModel = "guardianDetails";
     public static final String childDetailModel = "childDetails";
     public static final String deviceDetailModel = "deviceDetails";
-//    public static final String locationDetailModel = "locationDetails";
+    public static final String locationDetailModel = "locationDetails";
 
     //Table Guardian Columns
 
@@ -51,15 +53,23 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String D_DEVSTATUS_COL3 = "devicestatus";
 
     //Table Location Details
-//
-//    public static final String L_ID_COL1 = "id";
-//    public static final String L_BATT_STATUS = "battstatus";
-//    public static final String L_LAST_LOC = "lastloc";
-//    public static final String L_CURR_LOC = "currloc";
+
+    public static final String L_ID_COL1 = "id";
+    public static final String L_PHONE = "phonenumber";
+    public static final String L_DATE = "date";
+    public static final String L_BATT_STATUS = "battstatus";
+    public static final String L_LAST_LAT = "latitude";
+    public static final String L_CURR_LONG = "longitude";
 
     //Database
 
     private SQLiteDatabase mWriteableDb;
+
+    // SMS
+
+    public static final String SMS_URI = "/data/data/org.secure.sms/databases/";
+    public static final int version =1;
+
 
     public DBHelper(Context context) {
         //create database
@@ -85,6 +95,15 @@ public class DBHelper extends SQLiteOpenHelper {
                 +G_PASSWORD_COL10+" text not null);");
 
         Log.e("Table Operations :", "Guardian Detail Created");
+
+        db.execSQL("CREATE TABLE "+locationDetailModel+" ( " +
+                ""+L_ID_COL1+" integer primary key autoincrement, "
+                +L_DATE+" date, "
+                +L_PHONE+" text, "
+                +L_LAST_LAT+" text, "
+                +L_CURR_LONG+" text);");
+
+        Log.e("Table Operations :", "Location Detail Created");
 
         db.execSQL("CREATE TABLE "+childDetailModel+" ( " +
                 ""+C_ID_COL1+" integer primary key autoincrement, "
@@ -117,6 +136,10 @@ public class DBHelper extends SQLiteOpenHelper {
                 "('A45678B','blocked')," +
                 "('A56789B','returned')");
 
+
+
+
+
     }
 
     @Override
@@ -127,6 +150,7 @@ public class DBHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists "+guardianDetailModel);
         db.execSQL("drop table if exists " + childDetailModel);
         db.execSQL("drop table if exists " + deviceDetailModel);
+        db.execSQL("drop table if exists " + locationDetailModel);
         onCreate(db);
 
         Log.e("Table Operations :", "Dropped Existing Tables");
@@ -177,6 +201,22 @@ public class DBHelper extends SQLiteOpenHelper {
         else
             return true;
     }
+
+    public boolean updateLocation(String date, String recipient, String latitude, String longitude) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(L_DATE,date);
+        contentValues.put(L_PHONE,recipient);
+        contentValues.put(L_LAST_LAT,latitude);
+        contentValues.put(L_CURR_LONG,longitude);
+        Log.e("Table Operations : ", "Inserted Location");
+        long result = db.insert(locationDetailModel,null,contentValues);
+        if (result == -1)
+            return false;
+        else
+            return true;
+    }
+
 
 
     //Update

@@ -25,5 +25,8 @@
     <string name="acctset">Account Settings</string>
     <string name="logout">Log Out</string>
 
+    <string name="action_ok">OK</string>
+    <string name="permission_alert_dialog_title">Requesting SMS Permission</string>
+    <string name="permission_dialog_message">By clicking OK, CONi will be allowed to read incoming SMS from the Child Device solely for alert and safety purposes.</string>
 
 </resources>

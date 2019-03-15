@@ -26,7 +26,7 @@
                 android:layout_height="150dp"
                 android:contentDescription="@string/childimg"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/baseline_add_a_photo_black_18dp"
+                android:src="@drawable/addimgicon"
                 android:padding="10dp"
                 android:scaleType="fitXY"
                 android:background="@drawable/imageview_button"/>
