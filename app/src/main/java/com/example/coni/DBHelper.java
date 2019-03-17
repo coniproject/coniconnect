@@ -249,6 +249,11 @@ public class DBHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor currentLocation(String currlat, String currlong, SQLiteDatabase db) {
+        String query = "select latitude, longitude from locationDetails where id =(select MAX(id) from locationDetails)";
+        Cursor cursor = db.rawQuery(query, null);
+        return cursor;
+    }
 
 
 

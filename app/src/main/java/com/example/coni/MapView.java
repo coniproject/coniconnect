@@ -48,6 +48,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -106,19 +107,11 @@ public class MapView extends AppCompatActivity {
 
         if (checkGoogleServices()) {
             init();
+            if (!hasReadSmsPermission()) {
+                showRequestPermissionsInfoAlertDialog();
+            }
         }
 
-        if (!hasReadSmsPermission()) {
-            showRequestPermissionsInfoAlertDialog();
-        }
-
-//        BroadcastReceiver br = new SMSReceiver();
-//        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-//        filter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED);
-//        this.registerReceiver(br, filter);
-
-//        Intent intent = new Intent(view.getContext(), SMSReceiver.class);
-//        ContextCompat.startForegroundService(view.getContext(), intent);
         getLocationPermission();
 
         fab_menu = findViewById(R.id.fab_nav);
@@ -127,7 +120,7 @@ public class MapView extends AppCompatActivity {
         fab_hotline = findViewById(R.id.fab_hotline);
         fab_zones = findViewById(R.id.fab_safezone);
         fab_reg = findViewById(R.id.fab_addmember);
-//        fab_logout = findViewById(R.id.fab_logout);
+
         fab_update = findViewById(R.id.fab_update);
 
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -177,7 +170,6 @@ public class MapView extends AppCompatActivity {
                     fab_hotline.startAnimation(FabOpen);
                     fab_zones.startAnimation(FabOpen);
                     fab_reg.startAnimation(FabOpen);
-//                        fab_logout.startAnimation(FabOpen);
                     fab_update.startAnimation(FabOpen);
                     fab_menu.startAnimation(FabRotateCW);
 
@@ -186,7 +178,6 @@ public class MapView extends AppCompatActivity {
                     fab_hotline.setClickable(true);
                     fab_zones.setClickable(true);
                     fab_reg.setClickable(true);
-//                    fab_logout.setClickable(true);
                     fab_update.setClickable(true);
                     isOpen = true;
                 }
@@ -230,16 +221,11 @@ public class MapView extends AppCompatActivity {
 
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        if(mToggle.onOptionsItemSelected(item)) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-
         int id = item.getItemId();
 
         switch (id) {
             case R.id.menu_acctset:
-                //INsert Intent
+                //Insert Intent
                 break;
 
             case R.id.menu_logout:
@@ -367,15 +353,30 @@ public class MapView extends AppCompatActivity {
                         }
                     }
                 });
+
+
             }
 
         } catch (SecurityException e) {
             Log.d(TAG, "getDeviceLocation: Security Exception :" + e.getMessage());
         }
+
+//        sqLiteDatabase = mydb.getReadableDatabase();
+//        String query = "select latitude, longitude from locationDetails where id =(select MAX(id) from locationDetails)";
+//        Cursor getLocFrDB = sqLiteDatabase.rawQuery(query, null);
+//
+//        if(getLocFrDB.moveToLast()) {
+//
+//            //Get Latitude and Longitude AND Display to Map
+//
+//            moveCamera(new LatLng(getLocFrDB.getPosition([1);
+//
+//        }
+
     }
 
     private void moveCamera(LatLng latlng, float zoom) {
-        Log.d(TAG, "Moving Location to lng : " + latlng.latitude + ", lng : " + latlng.longitude);
+        Log.d(TAG, "Moving Location to lat : " + latlng.latitude + ", lng : " + latlng.longitude);
         mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoom));
 
     }
@@ -423,6 +424,11 @@ public class MapView extends AppCompatActivity {
         ActivityCompat.requestPermissions(MapView.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS},
                 SMS_PERMISSION_CODE);
     }
+
+
+    // ----> MAP
+
+
 
 }
 

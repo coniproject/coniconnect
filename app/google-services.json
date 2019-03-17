@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "238418323511",
+    "firebase_url": "https://conilocationdata.firebaseio.com",
+    "project_id": "conilocationdata",
+    "storage_bucket": "conilocationdata.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:238418323511:android:962fff9fdfc1754e",
+        "android_client_info": {
+          "package_name": "com.example.coni"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "238418323511-cdouahgonrvmklt4901r2fbuol3bb793.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.coni",
+            "certificate_hash": "8203290ba80c9f06e7209e1209ff9854ea8149c2"
+          }
+        },
+        {
+          "client_id": "238418323511-kka4arcmks8d132qulvmg5s39glvm1ek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLi9S835tbZcHykaobNxkRRmAYiiDX6fg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "238418323511-kka4arcmks8d132qulvmg5s39glvm1ek.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
