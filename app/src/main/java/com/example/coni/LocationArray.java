@@ -4,7 +4,6 @@ public class LocationArray {
 
     private String id;
     private String date;
-    private String recipient;
     private Double latitude;
     private Double longitude;
 
@@ -24,13 +23,6 @@ public class LocationArray {
         this.date = date;
     }
 
-    public String getRecipient() {
-        return recipient;
-    }
-
-    public void setRecipient(String recipient) {
-        this.recipient = recipient;
-    }
 
     public Double getLatitude() {
         return latitude;
@@ -48,10 +40,9 @@ public class LocationArray {
         this.longitude = longitude;
     }
 
-    public LocationArray(String id, String date, String recipient, Double latitude, Double longitude) {
+    public LocationArray(String id, String date, Double latitude, Double longitude) {
         this.id = id;
         this.date = date;
-        this.recipient = recipient;
         this.latitude = latitude;
         this.longitude = longitude;
     }

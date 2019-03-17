@@ -86,23 +86,26 @@ public class SmsReceiver extends BroadcastReceiver {
         String message = sms.getMessageBody();
         String[] separatedSMS = message.split("\\s+");
 
-        separatedSMS[1].replace('.',',');
-        separatedSMS[3].replace('.',',');
+//        separatedSMS[1].replace('.',',');
+//        separatedSMS[3].replace('.',',');
 
-//        databaseLocation.setValue(mydate);
-//        databaseLocation.setValue(senderNumber);
-//        databaseLocation.setValue(separatedSMS[1]);
-//        databaseLocation.setValue(separatedSMS[3]);
+
 
         String recipient = "recipient";
         String latitude = "latitude";
         String longitude = "longitude";
-        DatabaseReference mRef = databaseLocation.push();
-        mRef.child(mydate).setValue(mydate);
-        mRef.child(recipient).setValue(senderNumber);
-        mRef.child(latitude).setValue(separatedSMS[1]);
-        mRef.child(longitude).setValue(separatedSMS[3]);
-        Toast.makeText(context, "Location Updated", Toast.LENGTH_SHORT).show();
+
+        if(senderNumber.equals("+639179562277")) {
+            DatabaseReference mRef = databaseLocation.push();
+            mRef.child(mydate).setValue(mydate);
+            mRef.child(recipient).setValue(senderNumber);
+            mRef.child(latitude).setValue(separatedSMS[1]);
+            mRef.child(longitude).setValue(separatedSMS[3]);
+
+            Log.e("FIREBASE OPERATIONS:","Location data inserted");
+        }
+
+
 
     }
 

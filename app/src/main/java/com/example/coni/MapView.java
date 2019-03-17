@@ -40,20 +40,29 @@ import android.widget.Toolbar;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.sql.Array;
 import java.util.ArrayList;
 
-public class MapView extends AppCompatActivity {
+public class MapView extends AppCompatActivity{
 
     Context context;
     DBHelper mydb;
@@ -70,7 +79,9 @@ public class MapView extends AppCompatActivity {
     //Map essentials
     GoogleMap mGoogleMap;
     private static final float DEFAULT_ZOOM = 15f;
-
+    private DatabaseReference mChild;
+    private ChildEventListener mChildEventListener;
+    Marker marker;
 
     //Floating Action Button
 
@@ -319,6 +330,7 @@ public class MapView extends AppCompatActivity {
 
                 if (mLocationPermissionGranted) {
                     getDeviceLocation();
+                }
                     if (ActivityCompat.checkSelfPermission(MapView.this, Manifest.permission.ACCESS_FINE_LOCATION)
                             != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
                             (MapView.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -326,13 +338,11 @@ public class MapView extends AppCompatActivity {
                     }
                     mGoogleMap.setMyLocationEnabled(true);
                 }
-
-            }
         });
     }
 
     private void getDeviceLocation() {
-        Log.d(TAG, "Getting current location");
+        Log.d(TAG, "Getting current location from Firebase");
 
         mfusedlocationproviderclient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -361,17 +371,6 @@ public class MapView extends AppCompatActivity {
             Log.d(TAG, "getDeviceLocation: Security Exception :" + e.getMessage());
         }
 
-//        sqLiteDatabase = mydb.getReadableDatabase();
-//        String query = "select latitude, longitude from locationDetails where id =(select MAX(id) from locationDetails)";
-//        Cursor getLocFrDB = sqLiteDatabase.rawQuery(query, null);
-//
-//        if(getLocFrDB.moveToLast()) {
-//
-//            //Get Latitude and Longitude AND Display to Map
-//
-//            moveCamera(new LatLng(getLocFrDB.getPosition([1);
-//
-//        }
 
     }
 
