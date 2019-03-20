@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -248,22 +249,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 // Get Post object and use the values to update the UI
 
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
-//                    LocationArray locationArray = ds.getValue(LocationArray.class);
-//                    LatLng location = new LatLng(locationArray.latitudedb,locationArray.longitudedb);
 
-//                    HashMap <String, Double> hashMap = smsReceiver.getLocMap();
-//                    if(hashMap == null) {
-//
-//                        marker = mMap.addMarker(new MarkerOptions()
-//                                .position(putatan)
-//                                .title("Here")
-//                                .flat(true));
-//
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(putatan));
-//
-//                        System.out.println(coordinates);
-
-//                    }
 
                     Bundle bundle = getIntent().getExtras();
                     if(bundle != null) {
@@ -333,6 +319,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         ActivityCompat.requestPermissions(MapActivity.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.RECEIVE_SMS},
                 SMS_PERMISSION_CODE);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
     }
 
 
