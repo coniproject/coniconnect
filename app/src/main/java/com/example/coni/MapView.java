@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -62,7 +64,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.sql.Array;
 import java.util.ArrayList;
 
-public class MapView extends AppCompatActivity{
+public class MapView extends AppCompatActivity {
 
     Context context;
     DBHelper mydb;
@@ -115,6 +117,10 @@ public class MapView extends AppCompatActivity{
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         setContentView(R.layout.activity_map_view);
 
+
+        ChildEventListener mChildEventListener;
+        mChild = FirebaseDatabase.getInstance().getReference("conilocationdata");
+        mChild.push().setValue(marker);
 
         if (checkGoogleServices()) {
             init();
@@ -329,15 +335,37 @@ public class MapView extends AppCompatActivity{
                 mGoogleMap = googleMap;
 
                 if (mLocationPermissionGranted) {
-                    getDeviceLocation();
+//                    getDeviceLocation();
+
+//                    googleMap.setOnMarkerClickListener(this);
+//                                googleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+//                                mChild.addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                                        for(DataSnapshot s: dataSnapshot.getChildren()) {
+//                                            LocationArray locationArray = s.getValue(LocationArray.class);
+//                                            LatLng location = new LatLng(locationArray.latitude,locationArray.longitude);
+//                                            mGoogleMap.addMarker(new MarkerOptions().position(location).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+//
+//                                            Log.e("MAP OPERATIONS:","Marker has been added to updated location");
+//                            }
+//                            }
+//
+//                        @Override
+//                        public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                        }
+//                    });
+
                 }
-                    if (ActivityCompat.checkSelfPermission(MapView.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
-                            (MapView.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    mGoogleMap.setMyLocationEnabled(true);
+                if (ActivityCompat.checkSelfPermission(MapView.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
+                        (MapView.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
                 }
+                mGoogleMap.setMyLocationEnabled(true);
+            }
         });
     }
 
@@ -425,10 +453,7 @@ public class MapView extends AppCompatActivity{
     }
 
 
-    // ----> MAP
-
+    // ----> ADD MARKER ON CHILD LOCATION'S FROM UPDATE FIREBASE DATABASE
 
 
 }
-
-

@@ -57,7 +57,7 @@ public class UserLogin extends AppCompatActivity {
                 Cursor res = mydb.userlogin(loginname, loginpword, sqLiteDatabase);
 
                 if (res.moveToFirst()) {
-                    Intent intent = new Intent(UserLogin.this, MapView.class);
+                    Intent intent = new Intent(UserLogin.this, MapActivity.class);
                     startActivity(intent);
 
 

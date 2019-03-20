@@ -5,23 +5,22 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
 import android.os.Bundle;
-import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.sql.SQLInput;
 import java.util.Calendar;
+import java.util.HashMap;
 
 public class SmsReceiver extends BroadcastReceiver {
 
     DatabaseReference databaseLocation;
+    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
+    Context context;
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -85,29 +84,65 @@ public class SmsReceiver extends BroadcastReceiver {
         String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
         String message = sms.getMessageBody();
         String[] separatedSMS = message.split("\\s+");
+        String needHelp = "I NEED HELP";
 
-//        separatedSMS[1].replace('.',',');
-//        separatedSMS[3].replace('.',',');
-
-
-
-        String recipient = "recipient";
-        String latitude = "latitude";
-        String longitude = "longitude";
-
-        if(senderNumber.equals("+639179562277")) {
+//        if(senderNumber.equals("+639179562277")) {
             DatabaseReference mRef = databaseLocation.push();
-            mRef.child(mydate).setValue(mydate);
-            mRef.child(recipient).setValue(senderNumber);
-            mRef.child(latitude).setValue(separatedSMS[1]);
-            mRef.child(longitude).setValue(separatedSMS[3]);
+//            Double latitudedb = Double.parseDouble(separatedSMS[1]);
+//            Double longitudedb = Double.parseDouble(separatedSMS[3]);
 
-            Log.e("FIREBASE OPERATIONS:","Location data inserted");
+            double latitudedb = Double.parseDouble(separatedSMS[1]);
+            double longitudedb = Double.parseDouble(separatedSMS[3]);
+
+
+
+//            LocationArray locationArray = new LocationArray(mydate,senderNumber,latitudedb,longitudedb);
+//            databaseLocation.child("conilocationdata").push().setValue(locationArray);
+
+//            HashMap<String, String> data = new HashMap<String, String>();
+//            data.put("date", mydate);
+//            data.put("recipient", senderNumber);
+//            mRef.setValue(data);
+
+//            HashMap<String,Double> coordinates = new HashMap<String,Double>();
+            coordinates.put("latitude", latitudedb);
+            coordinates.put("longitude", longitudedb);
+            mRef.setValue(coordinates);
+
+            Double lcoords = coordinates.get("latitude");
+            Double lcoords2 = coordinates.get("longitude");
+
+
+
+
+            mRef.getKey();
+
+            System.out.println(lcoords);
+            System.out.println(lcoords2);
+
+            Intent toMap = new Intent(context,MapActivity.class);
+//            Bundle coords = new Bundle();
+            toMap.putExtra("lat",lcoords);
+            toMap.putExtra("lon",lcoords2);
+            toMap.putExtras(toMap);
+            context.startActivity(toMap);
+
+
+
+//            System.out.print(toMap);
+
+//        }
+
+
         }
 
-
+    public HashMap<String, Double> getLocMap() {
+        return coordinates;
 
     }
+
+
+
 
 
 
