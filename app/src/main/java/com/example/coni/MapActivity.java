@@ -262,8 +262,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             System.out.println("Bundle null");
                         }
 
-
-
                     }
 
 
