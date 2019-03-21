@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.SET_ALARM" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:allowBackup="true"
@@ -23,6 +25,13 @@
         <activity android:name=".AccountSettings" />
         <activity android:name=".FamilyList" />
         <activity android:name=".MapActivity" />
+        android:allowBackup="true">
+        ...
+        <service android:name=".GeofenceTransitionsIntentService"/>
+        android:allowBackup="true">
+        ...
+        <service android:name=".GeofenceTransitionsIntentService"/>
+        <activity android:name=".MapActivity"></activity>
 
         <receiver android:name=".SmsReceiver">
             <intent-filter>
@@ -36,6 +45,10 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDKNJyIaDzu7oRy84xqlVbOZ99-jCumD3g" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".ChildRegistration"
