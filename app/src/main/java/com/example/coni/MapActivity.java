@@ -7,11 +7,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -30,15 +34,28 @@ import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -52,7 +69,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener,
-        GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnMarkerClickListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMapClickListener,
+        ResultCallback<Status>
+      {
 
     //Map Access
     private GoogleMap mMap;
@@ -65,9 +87,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     SmsReceiver smsReceiver = new SmsReceiver();
     private HashMap<String, Double> coordinates = new HashMap<String, Double>();
 
+    private GoogleApiClient googleApiClient;
+    private GeofencingClient geofencingClient;
+    LocationRequest request;
+    LatLng latLngStart;
+    private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
+    // Create a Intent send by the notification
+    public static Intent makeNotificationIntent(Context context, String msg) {
+              Intent intent = new Intent( context, MapActivity.class );
+              intent.putExtra( NOTIFICATION_MSG, msg );
+              return intent;
+    }
+    private FusedLocationProviderClient fusedLocationClient;
 
-
-    //SMS
+          //SMS
     private static final int SMS_PERMISSION_CODE = 0;
 
     //Floating Action Button
@@ -81,10 +114,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        createGoogleApi();
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -191,11 +230,81 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+          // Create GoogleApiClient instance
+          private void createGoogleApi() {
+              Log.d(TAG, "createGoogleApi()");
+              if ( googleApiClient == null ) {
+                  googleApiClient = new GoogleApiClient.Builder( this )
+                          .addConnectionCallbacks( this )
+                          .addOnConnectionFailedListener( this )
+                          .addApi( LocationServices.API )
+                          .build();
+              }
+
+          }
+
+          @Override
+          protected void onStart() {
+              super.onStart();
+
+              // Call GoogleApiClient connection when starting the Activity
+              googleApiClient.connect();
+          }
+
+          @Override
+          protected void onStop() {
+              super.onStop();
+
+              // Disconnect GoogleApiClient when stopping Activity
+              googleApiClient.disconnect();
+          }
+
+
+          @Override
+          public void onConnected(@Nullable Bundle bundle) {
+              Log.d(TAG, "Google Api Client Connected");
+              request = new LocationRequest().create();
+              request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+              request.setInterval(1000);
+
+
+//              LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, this);
+              fusedLocationClient.getLastLocation()
+                      .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                          @Override
+                          public void onSuccess(Location location) {
+                              // Got last known location. In some rare situations this can be null.
+                              if (location != null) {
+                                  // Logic to handle location object
+
+                              }
+                          }
+                      });
+          }
+
+          @Override
+          public void onConnectionSuspended(int i) {
+              Log.d(TAG, "Google Connection Suspended");
+          }
+
+          @Override
+          public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+              Log.e(TAG, "Connection Failed:" + connectionResult.getErrorMessage());
+          }
+
+          @Override
+          public void onLocationChanged(Location location) {
+
+          }
+
+          public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
 
         switch (id) {
+            case R.id.add_boundary:
+                startGeofence();
+                break;
             case R.id.menu_acctset:
                 Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
                 startActivity(toAcct);
@@ -218,10 +327,107 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
 
-    }
+          @Override
+          public void onResult(@NonNull Status status) {
+            //  drawGeoFence();
+          }
+
+          Circle geoFenceLimits;
+          private void drawGeoFence() {
+
+              if ( geoFenceLimits != null )
+              {
+                  geoFenceLimits.remove();
+              }
+
+                  CircleOptions circleOptions = new CircleOptions()
+                          .center(geoFenceMarker.getPosition())
+                          .strokeColor(Color.argb(50, 70, 70, 70))
+                          .fillColor(Color.argb(100, 150, 150, 150))
+                          .radius(GEOFENCE_RADIUS);
+
+                  geoFenceLimits = mMap.addCircle(circleOptions);
+
+          }
+
+          // Add the created GeofenceRequest to the device's monitoring list
+            private void addGeofence(final GeofencingRequest request) {
+//                LocationServices.GeofencingApi.addGeofences(
+//                        googleApiClient,
+//                        request,
+//                        createGeofencePendingIntent()
+//                ).setResultCallback(this);
+
+                geofencingClient.addGeofences(request, createGeofencePendingIntent())
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                // your success code
+                              drawGeoFence();
+                        createGeofencePendingIntent();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // your fail code;
+                            }
+                        });
+            }
+
+
+
+          private PendingIntent geoFencePendingIntent;
+          private final int GEOFENCE_REQ_CODE = 0;
+          private PendingIntent createGeofencePendingIntent() {
+              if ( geoFencePendingIntent != null )
+                  return geoFencePendingIntent;
+
+              Intent intent = new Intent( this, GeofenceTransitionService.class);
+              return PendingIntent.getService(
+                      this, GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
+          }
+
+          // Start Geofence creation process
+        private void startGeofence() {
+            if( geoFenceMarker != null ) {
+                Geofence geofence = createGeofence( geoFenceMarker.getPosition(), GEOFENCE_RADIUS );
+                GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
+                addGeofence( geofenceRequest );
+            } else {
+                Log.e(TAG, "Geofence marker is null");
+            }
+        }
+
+          private static final long GEO_DURATION = 60 * 60 * 1000;
+          private static final String GEOFENCE_REQ_ID = "My Geofence";
+          private static final float GEOFENCE_RADIUS = 500f; // in meters
+
+          // Create a Geofence
+          private Geofence createGeofence(LatLng latLng, float radius ) {
+              return new Geofence.Builder()
+                      .setRequestId(GEOFENCE_REQ_ID)
+                      .setCircularRegion( latLng.latitude, latLng.longitude, radius)
+                      .setExpirationDuration( GEO_DURATION )
+                      .setTransitionTypes( Geofence.GEOFENCE_TRANSITION_ENTER
+                              | Geofence.GEOFENCE_TRANSITION_EXIT )
+                      .build();
+          }
+
+
+
+
+          // Create a Geofence Request
+          private GeofencingRequest createGeofenceRequest( Geofence geofence) {
+              return new GeofencingRequest.Builder()
+                      .setInitialTrigger( GeofencingRequest.INITIAL_TRIGGER_ENTER )
+                      .addGeofence(geofence)
+                      .build();
+          }
+
+
+
 
     @Override
     public boolean onMarkerClick(Marker marker) {
@@ -231,10 +437,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-            mMap = googleMap;
-            mMap.setMinZoomPreference(15.0f);
-            mMap.setMaxZoomPreference(20.0f);
-            final LatLng putatan = new LatLng(14.397420, 121.033051);
+        mMap = googleMap;
+        mMap.setMinZoomPreference(15.0f);
+        mMap.setMaxZoomPreference(20.0f);
+        mMap.setOnMapClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+        final LatLng putatan = new LatLng(14.397420, 121.033051);
+
 
             final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
 
@@ -264,7 +473,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
 
-                    }
+                }
 
 
             }
@@ -278,33 +487,74 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         };
         mRef.orderByKey().limitToLast(1).addValueEventListener(postListener);
 
-
-
     }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+
+          @Override
+          public void onMapClick(LatLng latLng) {
+                markerForGeofence(latLng);
+          }
+
+          Marker geoFenceMarker;
+          private void markerForGeofence(LatLng latLng) {
+            MarkerOptions optionMarker = new MarkerOptions()
+                    .position(latLng)
+                    .title("Geofence Marker");
+
+
+            if (mMap!=null)
+            {
+                if (geoFenceMarker!=null)
+                {
+                    geoFenceMarker.remove();
+                }
+
+                geoFenceMarker = mMap.addMarker(optionMarker);
+            }
+
+          }
+
+          private void removeGeofenceDraw() {
+              Log.d(TAG, "removeGeofenceDraw()");
+              if ( geoFenceMarker != null)
+                  geoFenceMarker.remove();
+              if ( geoFenceLimits != null )
+                  geoFenceLimits.remove();
+          }
+
+
 
 
     //    SMS PERMISSIONS
 
-    private void showRequestPermissionsInfoAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.permission_alert_dialog_title);
-        builder.setMessage(R.string.permission_dialog_message);
-        builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                requestReadAndSendSmsPermission();
-            }
-        });
-        builder.show();
-    }
+          private void showRequestPermissionsInfoAlertDialog() {
+              AlertDialog.Builder builder = new AlertDialog.Builder(this);
+              builder.setTitle(R.string.permission_alert_dialog_title);
+              builder.setMessage(R.string.permission_dialog_message);
+              builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialog, int which) {
+                      dialog.dismiss();
+                      requestReadAndSendSmsPermission();
+                  }
+              });
+              builder.show();
+          }
 
-    private boolean hasReadSmsPermission() {
-        return ContextCompat.checkSelfPermission(MapActivity.this,
-                Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(MapActivity.this,
-                        Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
-    }
+          private boolean hasReadSmsPermission() {
+              return ContextCompat.checkSelfPermission(MapActivity.this,
+                      Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
+                      ContextCompat.checkSelfPermission(MapActivity.this,
+                              Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+          }
 
     private void requestReadAndSendSmsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this, Manifest.permission.READ_SMS)) {
@@ -315,11 +565,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 SMS_PERMISSION_CODE);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
+
 
 
 

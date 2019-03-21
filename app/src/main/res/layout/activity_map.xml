@@ -1,3 +1,4 @@
+
 <android.support.design.widget.CoordinatorLayout android:id="@+id/profilenav"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,31 +12,31 @@
     >
 
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            tools:context=".MapviewPage"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:id="@+id/mapdisplay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                tools:context=".MapviewPage"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:id="@+id/mapdisplay"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+            android:layout_height="match_parent"/>
 
 
-            <view class="android.support.v7.app.AlertController$RecycleListView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="vertical"
-                android:visibility="visible">
+        <view class="android.support.v7.app.AlertController$RecycleListView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:visibility="visible">
 
-            </view>
+        </view>
 
 
-        </LinearLayout>
+    </LinearLayout>
 
 
     <android.support.design.widget.FloatingActionButton
@@ -92,6 +93,7 @@
         android:visibility="invisible"
         app:borderWidth="0dp"/>
 
+    Aya Shiii, [21.03.19 16:16]
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
