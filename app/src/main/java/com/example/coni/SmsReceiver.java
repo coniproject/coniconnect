@@ -1,12 +1,25 @@
 package com.example.coni;
 
+import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Vibrator;
+import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.firebase.FirebaseApp;
@@ -21,6 +34,7 @@ public class SmsReceiver extends BroadcastReceiver {
     DatabaseReference databaseLocation;
     private HashMap<String, Double> coordinates = new HashMap<String, Double>();
     Context context;
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -39,7 +53,8 @@ public class SmsReceiver extends BroadcastReceiver {
 
 
                     Toast.makeText(context, senderNumber + message, Toast.LENGTH_LONG).show();
-//                    sendSMStoDatabase(sms, context);
+
+//                    sendSMStoSQLiteDatabase(sms, context);
 
                 sendDataToFirebase(sms,context);
 
@@ -49,7 +64,7 @@ public class SmsReceiver extends BroadcastReceiver {
         }
     }
 
-    public void sendSMStoDatabase(SmsMessage sms, Context context) {
+    public void sendSMStoSQLiteDatabase(SmsMessage sms, Context context) {
 
         DBHelper mydb = new DBHelper(context);
         SQLiteDatabase db = mydb.getWritableDatabase();
@@ -86,14 +101,10 @@ public class SmsReceiver extends BroadcastReceiver {
         String[] separatedSMS = message.split("\\s+");
         String needHelp = "I NEED HELP";
 
-//        if(senderNumber.equals("+639179562277")) {
+        if (senderNumber.equals("+639959315552") && message.contains("LATITUDE:")) {
             DatabaseReference mRef = databaseLocation.push();
-//            Double latitudedb = Double.parseDouble(separatedSMS[1]);
-//            Double longitudedb = Double.parseDouble(separatedSMS[3]);
-
             double latitudedb = Double.parseDouble(separatedSMS[1]);
             double longitudedb = Double.parseDouble(separatedSMS[3]);
-
 
 
 //            LocationArray locationArray = new LocationArray(mydate,senderNumber,latitudedb,longitudedb);
@@ -113,36 +124,25 @@ public class SmsReceiver extends BroadcastReceiver {
             Double lcoords2 = coordinates.get("longitude");
 
 
-
-
             mRef.getKey();
 
             System.out.println(lcoords);
             System.out.println(lcoords2);
 
-            Intent toMap = new Intent(context,MapActivity.class);
-//            Bundle coords = new Bundle();
-            toMap.putExtra("lat",lcoords);
-            toMap.putExtra("lon",lcoords2);
+            Intent toMap = new Intent(context, MapActivity.class);
+            toMap.putExtra("lat", lcoords);
+            toMap.putExtra("lon", lcoords2);
             toMap.putExtras(toMap);
             context.startActivity(toMap);
+        }
 
-
-
-//            System.out.print(toMap);
-
+//        if (senderNumber.equals("+639959315552") && message.equals(needHelp)) {
+//
 //        }
 
 
-        }
 
-    public HashMap<String, Double> getLocMap() {
-        return coordinates;
-
-    }
-
-
-
+     }
 
 
 

@@ -255,6 +255,13 @@ public class DBHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
+    public Cursor childList(SQLiteDatabase db) {
+        String query = "select * from childDetails";
+        Log.d("childList",query);
+        Cursor cdata = db.rawQuery(query,null);
+        return  cdata;
+    }
+
 
 
 }

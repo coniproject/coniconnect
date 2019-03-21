@@ -1,26 +1,33 @@
 package com.example.coni;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -39,6 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,13 +80,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
 
-    //RecyclerView - to inflate Child Details
-
-    RecyclerAdapter recyclerAdapter;
-    RecyclerView recyclerView;
-    private RecyclerView.LayoutManager mLayoutManage;
-    ArrayList<ChildArray> carray = new ArrayList<>();
-    SQLiteDatabase sqLiteDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,21 +113,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
         FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlock);
 
-        recyclerView = findViewById(R.id.recyclerView);
-
-
-        //RecyclerAdapter
-
-
-        mLayoutManage = new LinearLayoutManager(this);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(mLayoutManage);
-
-        DBHelper mydb = new DBHelper(this);
-        sqLiteDatabase = mydb.getReadableDatabase();
-
-//        refreshDataList();
-
+        //Floating Action Button
 
         fab_menu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,7 +197,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         switch (id) {
             case R.id.menu_acctset:
-                //Insert Intent
+                Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
+                startActivity(toAcct);
+                break;
+
+            case R.id.menu_famlist:
+//                Intent toList = new Intent(MapActivity.this,FamilyList.class);
+//                startActivity(toList);
+
+                Toast.makeText(this, "Under Construction.", Toast.LENGTH_SHORT).show();
                 break;
 
             case R.id.menu_logout:
@@ -236,40 +231,40 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        mMap = googleMap;
-        mMap.setMinZoomPreference(15.0f);
-        mMap.setMaxZoomPreference(20.0f);
-        final LatLng putatan = new LatLng(14.397420, 121.033051);
+            mMap = googleMap;
+            mMap.setMinZoomPreference(15.0f);
+            mMap.setMaxZoomPreference(20.0f);
+            final LatLng putatan = new LatLng(14.397420, 121.033051);
 
-        final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
+            final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
 
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get Post object and use the values to update the UI
 
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
 
 
-                    Bundle bundle = getIntent().getExtras();
-                    if(bundle != null) {
-                        double lat1 = bundle.getDouble("lat");
-                        double lon2 = bundle.getDouble("lon");
+                        Bundle bundle = getIntent().getExtras();
+                        if(bundle != null) {
+                            double lat1 = bundle.getDouble("lat");
+                            double lon2 = bundle.getDouble("lon");
 
-                        LatLng location = new LatLng(lat1,lon2);
-                        marker = mMap.addMarker(new MarkerOptions()
-                                .position(location)
-                                .title("Here")
-                                .flat(true));
+                            LatLng location = new LatLng(lat1,lon2);
+                            marker = mMap.addMarker(new MarkerOptions()
+                                    .position(location)
+                                    .title("Here")
+                                    .flat(true));
 
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-                    } else {
-                        System.out.println("Bundle null");
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+                        } else {
+                            System.out.println("Bundle null");
+                        }
+
+
+
                     }
-
-
-
-                }
 
 
             }
@@ -286,7 +281,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     }
-
 
 
     //    SMS PERMISSIONS
@@ -326,6 +320,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
+
+
+
 
 
 }

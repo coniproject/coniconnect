@@ -240,6 +240,7 @@ public class ChildRegistration extends AppCompatActivity {
         byte[] photo = getimagebyte(imgchild);
 
         mydb.addchild(photo,vallastname,valfirstname, valmidname,valage,valbday,valgender);
+        System.out.println(vallastname);
         Toast.makeText(ChildRegistration.this, "Child registered.", Toast.LENGTH_SHORT).show();
         Intent toMap = new Intent(ChildRegistration.this, MapView.class);
         startActivity(toMap);

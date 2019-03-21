@@ -9,6 +9,11 @@
         android:icon="@drawable/outline_notifications_white_18dp"
         app:showAsAction="always">
     </item>
+
+    <item
+        android:title="@string/my_family"
+        android:id="@+id/menu_famlist">
+    </item>
     <item
         android:title="@string/acctset"
         android:id="@+id/menu_acctset">

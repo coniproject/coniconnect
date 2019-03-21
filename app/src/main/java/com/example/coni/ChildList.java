@@ -11,6 +11,7 @@ public class ChildList extends AppCompatActivity {
 
     ImageView imgchild;
     TextView txtcname;
+    TextView txtcage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,20 +20,16 @@ public class ChildList extends AppCompatActivity {
 
         imgchild = findViewById(R.id.imageChild);
         txtcname = findViewById(R.id.txtChildName);
-//        txtclocation = findViewById(R.id.txtCurrentLoc);
-//        txtbattstatus = findViewById(R.id.txtBattStatus);
-
-        Bundle extra = getIntent().getExtras();
-        String KeyName = extra.getString("KeyName");
-//        String KeyLoc = extra.getString("KeyLoc");
-//        String KeyBatt = extra.getString("KeyBatt");
-        byte[] KeyImg = extra.getByteArray("KeyImg");
+        txtcage = findViewById(R.id.txtCurrentLoc);
 
 
-        txtcname.setText(KeyName);
-//        txtclocation.setText(KeyLoc);
-//        txtbattstatus.setText(KeyBatt);
-        Bitmap bm = BitmapFactory.decodeByteArray(KeyImg, 0, KeyImg.length);
-        imgchild.setImageBitmap(bm);
+//        Bundle extra = getIntent().getExtras();
+//        String KeyName = extra.getString("KeyName");
+//        byte[] KeyImg = extra.getByteArray("KeyImg");
+
+
+//        txtcname.setText(KeyName);
+//        Bitmap bm = BitmapFactory.decodeByteArray(KeyImg, 0, KeyImg.length);
+//        imgchild.setImageBitmap(bm);
     }
 }

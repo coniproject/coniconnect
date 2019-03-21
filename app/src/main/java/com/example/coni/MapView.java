@@ -97,10 +97,6 @@ public class MapView extends AppCompatActivity {
 
     //RecyclerView - to inflate Child Details
 
-    RecyclerAdapter recyclerAdapter;
-    RecyclerView recyclerView;
-    private RecyclerView.LayoutManager mLayoutManage;
-    ArrayList<ChildArray> carray = new ArrayList<>();
     SQLiteDatabase sqLiteDatabase;
 
     //SMS
@@ -145,19 +141,10 @@ public class MapView extends AppCompatActivity {
         FabRotateCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_clockwise);
         FabRotateAntiCW = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate_anticlock);
 
-        recyclerView = findViewById(R.id.recyclerView);
-
-        //RecyclerAdapter
-
-
-        mLayoutManage = new LinearLayoutManager(this);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(mLayoutManage);
 
         DBHelper mydb = new DBHelper(this);
         sqLiteDatabase = mydb.getReadableDatabase();
 
-//        refreshDataList();
 
 
         fab_menu.setOnClickListener(new View.OnClickListener() {
