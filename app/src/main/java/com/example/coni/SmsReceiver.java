@@ -101,7 +101,7 @@ public class SmsReceiver extends BroadcastReceiver {
         String[] separatedSMS = message.split("\\s+");
         String needHelp = "I NEED HELP";
 
-        if (senderNumber.equals("+639959315552") && message.contains("LATITUDE:")) {
+//        if (senderNumber.equals("+639959315552") && message.contains("LATITUDE:")) {
             DatabaseReference mRef = databaseLocation.push();
             double latitudedb = Double.parseDouble(separatedSMS[1]);
             double longitudedb = Double.parseDouble(separatedSMS[3]);
@@ -134,7 +134,7 @@ public class SmsReceiver extends BroadcastReceiver {
             toMap.putExtra("lon", lcoords2);
             toMap.putExtras(toMap);
             context.startActivity(toMap);
-        }
+//        }
 
 //        if (senderNumber.equals("+639959315552") && message.equals(needHelp)) {
 //
