@@ -12,7 +12,10 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,12 +29,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.SmsMessage;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -50,9 +60,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -64,15 +76,23 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.graphics.Color.rgb;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, LocationListener,
-        GoogleMap.OnMarkerClickListener,GoogleMap.OnMapClickListener
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
+        LocationListener,
+        GoogleMap.OnMarkerClickListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleMap.OnMapClickListener,
+        ResultCallback<Status>
       {
 
     //Map Access
@@ -86,25 +106,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     SmsReceiver smsReceiver = new SmsReceiver();
     private HashMap<String, Double> coordinates = new HashMap<String, Double>();
 
-    private GoogleApiClient googleApiClient;
+    private GoogleApiClient client;
     private GeofencingClient geofencingClient;
-    LocationRequest request;
+    private LocationRequest locationRequest;
+    private Marker currentLocationmMarker;
+    private Location lastlocation;
+
+          public static final int REQUEST_LOCATION_CODE=99;
+          int PROXIMITY_RADIUS=10000;
     LatLng latLngStart;
     private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
-
-    private PendingIntent geoFencePendingIntent;
-    public final int GEOFENCE_REQ_CODE = 0;
-
-    Circle circle;
-    DatabaseReference circleBound;
-
-
     // Create a Intent send by the notification
     public static Intent makeNotificationIntent(Context context, String msg) {
               Intent intent = new Intent( context, MapActivity.class );
               intent.putExtra( NOTIFICATION_MSG, msg );
               return intent;
     }
+          private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
+
+          private PendingIntent geoFencePendingIntent;
+          public final int GEOFENCE_REQ_CODE = 0;
+
+          Circle circle;
+          DatabaseReference circleBound;
     private FusedLocationProviderClient fusedLocationClient;
 
           //SMS
@@ -120,6 +144,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
 
+double latitude,longitude;
 
 
     @Override
@@ -127,6 +152,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        createGoogleApi();
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -239,6 +268,215 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+          @Override
+          public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+              switch(requestCode)
+              {
+                  case REQUEST_LOCATION_CODE:
+                      if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                      {
+                          if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED)
+                          {
+                              if(client == null)
+                              {
+                                  bulidGoogleApiClient();
+                              }
+                              mMap.setMyLocationEnabled(true);
+                          }
+                      }
+                      else
+                      {
+                          Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
+                      }
+              }
+          }
+
+          protected synchronized void bulidGoogleApiClient() {
+              client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+              client.connect();
+
+          }
+
+          public void onClick(View v)
+          {
+              Object dataTransfer[] = new Object[2];
+              GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+
+              switch(v.getId())
+              {
+                  case R.id.B_search:
+                      EditText tf_location =  findViewById(R.id.TF_location);
+                      String location = tf_location.getText().toString();
+                      List<Address> addressList;
+
+
+                      if(!location.equals(""))
+                      {
+                          Geocoder geocoder = new Geocoder(this);
+
+                          try {
+                              addressList = geocoder.getFromLocationName(location, 5);
+
+                              if(addressList != null)
+                              {
+                                  for(int i = 0;i<addressList.size();i++)
+                                  {
+                                      LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
+                                      MarkerOptions markerOptions = new MarkerOptions();
+                                      markerOptions.position(latLng);
+                                      markerOptions.title(location);
+                                      mMap.addMarker(markerOptions);
+                                      mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                                      mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
+                                  }
+                              }
+                          } catch (IOException e) {
+                              e.printStackTrace();
+                          }
+                      }
+                      break;
+//                  case R.id.B_hopistals:
+//                      mMap.clear();
+//                      String hospital = "hospital";
+//                      String url = getUrl(latitude, longitude, hospital);
+//                      dataTransfer[0] = mMap;
+//                      dataTransfer[1] = url;
+//
+//                      getNearbyPlacesData.execute(dataTransfer);
+//                      Toast.makeText(MapActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
+//                      break;
+//
+//
+//                  case R.id.B_schools:
+//                      mMap.clear();
+//                      String school = "school";
+//                      url = getUrl(latitude, longitude, school);
+//                      dataTransfer[0] = mMap;
+//                      dataTransfer[1] = url;
+//
+//                      getNearbyPlacesData.execute(dataTransfer);
+//                      Toast.makeText(MapActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
+//                      break;
+//                  case R.id.B_restaurants:
+//                      mMap.clear();
+//                      String resturant = "restuarant";
+//                      url = getUrl(latitude, longitude, resturant);
+//                      dataTransfer[0] = mMap;
+//                      dataTransfer[1] = url;
+//
+//                      getNearbyPlacesData.execute(dataTransfer);
+//                      Toast.makeText(MapActivity.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
+//                      break;
+//                  case R.id.B_to:
+              }
+          }
+
+
+          private String getUrl(double latitude , double longitude , String nearbyPlace)
+          {
+
+              StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+              googlePlaceUrl.append("location="+latitude+","+longitude);
+              googlePlaceUrl.append("&radius="+PROXIMITY_RADIUS);
+              googlePlaceUrl.append("&type="+nearbyPlace);
+              googlePlaceUrl.append("&sensor=true");
+              googlePlaceUrl.append("&key="+"AIzaSyDKNJyIaDzu7oRy84xqlVbOZ99-jCumD3g");
+
+              Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
+
+              return googlePlaceUrl.toString();
+          }
+
+
+
+          @Override
+          public void onLocationChanged(Location location) {
+              latitude = location.getLatitude();
+              longitude = location.getLongitude();
+              lastlocation = location;
+              if(currentLocationmMarker != null)
+              {
+                  currentLocationmMarker.remove();
+
+              }
+              Log.d("lat = ",""+latitude);
+              LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
+              MarkerOptions markerOptions = new MarkerOptions();
+              markerOptions.position(latLng);
+              markerOptions.title("Current Location");
+              markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+              currentLocationmMarker = mMap.addMarker(markerOptions);
+
+//              if(client != null)
+//              {
+//                  fusedLocationClient.getLastLocation().addOnSuccessListener(this, locations -> {
+//                      if (locations != null) {
+//                          latitude = locations.getLatitude();
+//                          longitude = locations.getLongitude();
+//                          txtLocation.setText(String.format(Locale.US, "%s -- %s", latitude, longitude)
+//                          );
+//                      }
+//                  });
+//              } else {
+//                  Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+//              }
+////                  LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
+
+          }
+
+
+          @Override
+          public void onConnected(@Nullable Bundle bundle) {
+              locationRequest = new LocationRequest();
+              locationRequest.setInterval(100);
+              locationRequest.setFastestInterval(1000);
+              locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+
+
+//              if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)
+//              {
+//                  LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+//              }
+          }
+
+          @Override
+          public void onConnectionSuspended(int i) {
+              Log.d(TAG, "Google Connection Suspended");
+          }
+
+          @Override
+          public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+              Log.e(TAG, "Connection Failed:" + connectionResult.getErrorMessage());
+          }
+
+
+          public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.menu_acctset:
+                Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
+                startActivity(toAcct);
+                break;
+
+            case R.id.menu_famlist:
+//                Intent toList = new Intent(MapActivity.this,FamilyList.class);
+//                startActivity(toList);
+
+                Toast.makeText(this, "Under Construction.", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.menu_logout:
+                Intent toMain = new Intent(MapActivity.this, MainActivity.class);
+                startActivity(toMain);
+                Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+
+    }
+
     @Override
     public boolean onMarkerClick(Marker marker) {
         return false;
@@ -252,6 +490,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
+        bulidGoogleApiClient();
         final LatLng putatan = new LatLng(14.397420, 121.033051);
 
 
@@ -286,12 +525,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         }
 
 
-                    }
-
 
                 }
 
 
+            }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -311,6 +549,41 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
+
+
+          @Override
+          public void onMapClick(LatLng latLng) {
+                markerForGeofence(latLng);
+          }
+
+          Marker geoFenceMarker;
+          private void markerForGeofence(LatLng latLng) {
+            MarkerOptions optionMarker = new MarkerOptions()
+                    .position(latLng)
+                    .title("Geofence Marker");
+
+
+            if (mMap!=null)
+            {
+                if (geoFenceMarker!=null)
+                {
+                    geoFenceMarker.remove();
+                }
+
+                geoFenceMarker = mMap.addMarker(optionMarker);
+            }
+
+          }
+
+          private void removeGeofenceDraw() {
+              Log.d(TAG, "removeGeofenceDraw()");
+              if ( geoFenceMarker != null)
+                  geoFenceMarker.remove();
+              if ( geoFenceLimits != null )
+                  geoFenceLimits.remove();
+          }
+
+
 
 
     //    SMS PERMISSIONS
