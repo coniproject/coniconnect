@@ -87,12 +87,9 @@ import java.util.Map;
 import static android.graphics.Color.rgb;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
-        LocationListener,
+//        LocationListener,
         GoogleMap.OnMarkerClickListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnMapClickListener,
-        ResultCallback<Status>
+        GoogleMap.OnMapClickListener
       {
 
     //Map Access
@@ -109,20 +106,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleApiClient client;
     private GeofencingClient geofencingClient;
     private LocationRequest locationRequest;
-    private Marker currentLocationmMarker;
+   // private Marker currentLocationmMarker;
     private Location lastlocation;
 
           public static final int REQUEST_LOCATION_CODE=99;
           int PROXIMITY_RADIUS=10000;
     LatLng latLngStart;
-    private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
-    // Create a Intent send by the notification
-    public static Intent makeNotificationIntent(Context context, String msg) {
-              Intent intent = new Intent( context, MapActivity.class );
-              intent.putExtra( NOTIFICATION_MSG, msg );
-              return intent;
-    }
-          private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
 
           private PendingIntent geoFencePendingIntent;
           public final int GEOFENCE_REQ_CODE = 0;
@@ -155,7 +144,7 @@ double latitude,longitude;
         geofencingClient = LocationServices.getGeofencingClient(this);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        createGoogleApi();
+
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -268,186 +257,7 @@ double latitude,longitude;
     }
 
 
-          @Override
-          public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-              switch(requestCode)
-              {
-                  case REQUEST_LOCATION_CODE:
-                      if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                      {
-                          if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED)
-                          {
-                              if(client == null)
-                              {
-                                  bulidGoogleApiClient();
-                              }
-                              mMap.setMyLocationEnabled(true);
-                          }
-                      }
-                      else
-                      {
-                          Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
-                      }
-              }
-          }
 
-          protected synchronized void bulidGoogleApiClient() {
-              client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-              client.connect();
-
-          }
-
-          public void onClick(View v)
-          {
-              Object dataTransfer[] = new Object[2];
-              GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
-
-              switch(v.getId())
-              {
-                  case R.id.B_search:
-                      EditText tf_location =  findViewById(R.id.TF_location);
-                      String location = tf_location.getText().toString();
-                      List<Address> addressList;
-
-
-                      if(!location.equals(""))
-                      {
-                          Geocoder geocoder = new Geocoder(this);
-
-                          try {
-                              addressList = geocoder.getFromLocationName(location, 5);
-
-                              if(addressList != null)
-                              {
-                                  for(int i = 0;i<addressList.size();i++)
-                                  {
-                                      LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
-                                      MarkerOptions markerOptions = new MarkerOptions();
-                                      markerOptions.position(latLng);
-                                      markerOptions.title(location);
-                                      mMap.addMarker(markerOptions);
-                                      mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                                      mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-                                  }
-                              }
-                          } catch (IOException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                      break;
-//                  case R.id.B_hopistals:
-//                      mMap.clear();
-//                      String hospital = "hospital";
-//                      String url = getUrl(latitude, longitude, hospital);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
-//                      break;
-//
-//
-//                  case R.id.B_schools:
-//                      mMap.clear();
-//                      String school = "school";
-//                      url = getUrl(latitude, longitude, school);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
-//                      break;
-//                  case R.id.B_restaurants:
-//                      mMap.clear();
-//                      String resturant = "restuarant";
-//                      url = getUrl(latitude, longitude, resturant);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
-//                      break;
-//                  case R.id.B_to:
-              }
-          }
-
-
-          private String getUrl(double latitude , double longitude , String nearbyPlace)
-          {
-
-              StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-              googlePlaceUrl.append("location="+latitude+","+longitude);
-              googlePlaceUrl.append("&radius="+PROXIMITY_RADIUS);
-              googlePlaceUrl.append("&type="+nearbyPlace);
-              googlePlaceUrl.append("&sensor=true");
-              googlePlaceUrl.append("&key="+"AIzaSyDKNJyIaDzu7oRy84xqlVbOZ99-jCumD3g");
-
-              Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
-
-              return googlePlaceUrl.toString();
-          }
-
-
-
-          @Override
-          public void onLocationChanged(Location location) {
-              latitude = location.getLatitude();
-              longitude = location.getLongitude();
-              lastlocation = location;
-              if(currentLocationmMarker != null)
-              {
-                  currentLocationmMarker.remove();
-
-              }
-              Log.d("lat = ",""+latitude);
-              LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
-              MarkerOptions markerOptions = new MarkerOptions();
-              markerOptions.position(latLng);
-              markerOptions.title("Current Location");
-              markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-              currentLocationmMarker = mMap.addMarker(markerOptions);
-
-//              if(client != null)
-//              {
-//                  fusedLocationClient.getLastLocation().addOnSuccessListener(this, locations -> {
-//                      if (locations != null) {
-//                          latitude = locations.getLatitude();
-//                          longitude = locations.getLongitude();
-//                          txtLocation.setText(String.format(Locale.US, "%s -- %s", latitude, longitude)
-//                          );
-//                      }
-//                  });
-//              } else {
-//                  Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-//              }
-////                  LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
-
-          }
-
-
-          @Override
-          public void onConnected(@Nullable Bundle bundle) {
-              locationRequest = new LocationRequest();
-              locationRequest.setInterval(100);
-              locationRequest.setFastestInterval(1000);
-              locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-
-//              if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)
-//              {
-//                  LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
-//              }
-          }
-
-          @Override
-          public void onConnectionSuspended(int i) {
-              Log.d(TAG, "Google Connection Suspended");
-          }
-
-          @Override
-          public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-              Log.e(TAG, "Connection Failed:" + connectionResult.getErrorMessage());
-          }
 
 
           public boolean onOptionsItemSelected(MenuItem item) {
@@ -490,7 +300,6 @@ double latitude,longitude;
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
         mMap.setOnMarkerClickListener(this);
-        bulidGoogleApiClient();
         final LatLng putatan = new LatLng(14.397420, 121.033051);
 
 
@@ -551,10 +360,10 @@ double latitude,longitude;
     }
 
 
-          @Override
-          public void onMapClick(LatLng latLng) {
-                markerForGeofence(latLng);
-          }
+//          @Override
+//          public void onMapClick(LatLng latLng) {
+//                markerForGeofence(latLng);
+//          }
 
           Marker geoFenceMarker;
           private void markerForGeofence(LatLng latLng) {
@@ -579,8 +388,8 @@ double latitude,longitude;
               Log.d(TAG, "removeGeofenceDraw()");
               if ( geoFenceMarker != null)
                   geoFenceMarker.remove();
-              if ( geoFenceLimits != null )
-                  geoFenceLimits.remove();
+//              if ( geoFenceLimits != null )
+//                  geoFenceLimits.remove();
           }
 
 
@@ -607,6 +416,7 @@ double latitude,longitude;
                       Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                       ContextCompat.checkSelfPermission(MapActivity.this,
                               Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+
           }
 
     private void requestReadAndSendSmsPermission() {
@@ -619,10 +429,7 @@ double latitude,longitude;
     }
 
 
-          @Override
-          public void onLocationChanged(Location location) {
 
-          }
 
           @Override
           public void onMapClick(LatLng latLng) {
