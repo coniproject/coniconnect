@@ -25,14 +25,8 @@
         <activity android:name=".AccountSettings" />
         <activity android:name=".FamilyList" />
         <activity android:name=".MapActivity" />
-        android:allowBackup="true">
-        ...
         <service android:name=".GeofenceTransitionsIntentService"/>
-        android:allowBackup="true">
-        ...
         <service android:name=".GeofenceTransitionsIntentService"/>
-        <activity android:name=".MapActivity"></activity>
-
         <receiver android:name=".SmsReceiver">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />

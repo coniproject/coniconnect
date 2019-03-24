@@ -228,9 +228,9 @@ public class MapView extends AppCompatActivity {
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.menu_acctset:
-                //Insert Intent
-                break;
+//            case R.id.menu_acctset:
+//                //Insert Intent
+//                break;
 
             case R.id.menu_logout:
                 Intent toMain = new Intent(MapView.this, MainActivity.class);

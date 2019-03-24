@@ -2,26 +2,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!--<item-->
+        <!--android:title="notif"-->
+        <!--android:icon="@drawable/outline_notifications_white_18dp"-->
+        <!--app:showAsAction="always">-->
+    <!--</item>-->
+
+    <!--<item-->
+        <!--android:title="@string/my_family"-->
+        <!--android:id="@+id/menu_famlist">-->
+    <!--</item>-->
+    <!--<item-->
+        <!--android:title="@string/acctset"-->
+        <!--android:id="@+id/menu_acctset">-->
+        <!--</item>-->
     <item
+        android:title="@string/add_boundary"
+        android:id="@+id/add_boundary">
 
-
-        android:title="notif"
-        android:icon="@drawable/outline_notifications_white_18dp"
-        app:showAsAction="always">
     </item>
-
-    <item
-        android:title="@string/my_family"
-        android:id="@+id/menu_famlist">
-    </item>
-    <item android:title="Add Boundary"
-        android:id="@+id/add_boundary"
-
-    ></item>
-    <item
-        android:title="@string/acctset"
-        android:id="@+id/menu_acctset">
-        </item>
     <item   android:title="@string/logout"
         android:id="@+id/menu_logout">
 

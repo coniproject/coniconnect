@@ -88,12 +88,9 @@ import static android.graphics.Color.rgb;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
         LocationListener,
-        GoogleMap.OnMarkerClickListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnMapClickListener,
-        ResultCallback<Status>
-      {
+        GoogleMap.OnCircleClickListener
+{
 
     //Map Access
     private GoogleMap mMap;
@@ -104,7 +101,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private final Handler handler = new Handler();
     private static final float DEFAULT_ZOOM = 15f;
     SmsReceiver smsReceiver = new SmsReceiver();
-    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
+//    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
+    HashMapList coordslist = new HashMapList();
 
     private GoogleApiClient client;
     private GeofencingClient geofencingClient;
@@ -112,26 +110,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Marker currentLocationmMarker;
     private Location lastlocation;
 
-          public static final int REQUEST_LOCATION_CODE=99;
-          int PROXIMITY_RADIUS=10000;
-    LatLng latLngStart;
-    private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
-    // Create a Intent send by the notification
-    public static Intent makeNotificationIntent(Context context, String msg) {
-              Intent intent = new Intent( context, MapActivity.class );
-              intent.putExtra( NOTIFICATION_MSG, msg );
-              return intent;
-    }
-          private static final String NOTIFICATION_MSG = "NOTIFICATION MSG";
+    public static final int REQUEST_LOCATION_CODE=99;
+    int PROXIMITY_RADIUS=10000;
 
-          private PendingIntent geoFencePendingIntent;
-          public final int GEOFENCE_REQ_CODE = 0;
+    Circle circle,entered,exit;
+    DatabaseReference circleBound;
 
-          Circle circle;
-          DatabaseReference circleBound;
-    private FusedLocationProviderClient fusedLocationClient;
-
-          //SMS
+    //SMS
     private static final int SMS_PERMISSION_CODE = 0;
 
     //Floating Action Button
@@ -144,7 +129,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     Animation FabOpen, FabClose, FabRotateCW, FabRotateAntiCW;
 
-double latitude,longitude;
 
 
     @Override
@@ -152,10 +136,6 @@ double latitude,longitude;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        geofencingClient = LocationServices.getGeofencingClient(this);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        createGoogleApi();
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -239,12 +219,6 @@ double latitude,longitude;
         fab_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent toHome = new Intent(MapActivity.this, MapActivity.class);
-//                startActivity(toHome);
-
-                //Reload Maps Instance
-                finish();
-                startActivity(getIntent());
 
             }
         });
@@ -267,221 +241,6 @@ double latitude,longitude;
 
     }
 
-
-          @Override
-          public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-              switch(requestCode)
-              {
-                  case REQUEST_LOCATION_CODE:
-                      if(grantResults.length >0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                      {
-                          if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION) !=  PackageManager.PERMISSION_GRANTED)
-                          {
-                              if(client == null)
-                              {
-                                  bulidGoogleApiClient();
-                              }
-                              mMap.setMyLocationEnabled(true);
-                          }
-                      }
-                      else
-                      {
-                          Toast.makeText(this,"Permission Denied" , Toast.LENGTH_LONG).show();
-                      }
-              }
-          }
-
-          protected synchronized void bulidGoogleApiClient() {
-              client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
-              client.connect();
-
-          }
-
-          public void onClick(View v)
-          {
-              Object dataTransfer[] = new Object[2];
-              GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
-
-              switch(v.getId())
-              {
-                  case R.id.B_search:
-                      EditText tf_location =  findViewById(R.id.TF_location);
-                      String location = tf_location.getText().toString();
-                      List<Address> addressList;
-
-
-                      if(!location.equals(""))
-                      {
-                          Geocoder geocoder = new Geocoder(this);
-
-                          try {
-                              addressList = geocoder.getFromLocationName(location, 5);
-
-                              if(addressList != null)
-                              {
-                                  for(int i = 0;i<addressList.size();i++)
-                                  {
-                                      LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
-                                      MarkerOptions markerOptions = new MarkerOptions();
-                                      markerOptions.position(latLng);
-                                      markerOptions.title(location);
-                                      mMap.addMarker(markerOptions);
-                                      mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                                      mMap.animateCamera(CameraUpdateFactory.zoomTo(10));
-                                  }
-                              }
-                          } catch (IOException e) {
-                              e.printStackTrace();
-                          }
-                      }
-                      break;
-//                  case R.id.B_hopistals:
-//                      mMap.clear();
-//                      String hospital = "hospital";
-//                      String url = getUrl(latitude, longitude, hospital);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
-//                      break;
-//
-//
-//                  case R.id.B_schools:
-//                      mMap.clear();
-//                      String school = "school";
-//                      url = getUrl(latitude, longitude, school);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
-//                      break;
-//                  case R.id.B_restaurants:
-//                      mMap.clear();
-//                      String resturant = "restuarant";
-//                      url = getUrl(latitude, longitude, resturant);
-//                      dataTransfer[0] = mMap;
-//                      dataTransfer[1] = url;
-//
-//                      getNearbyPlacesData.execute(dataTransfer);
-//                      Toast.makeText(MapActivity.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
-//                      break;
-//                  case R.id.B_to:
-              }
-          }
-
-
-          private String getUrl(double latitude , double longitude , String nearbyPlace)
-          {
-
-              StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-              googlePlaceUrl.append("location="+latitude+","+longitude);
-              googlePlaceUrl.append("&radius="+PROXIMITY_RADIUS);
-              googlePlaceUrl.append("&type="+nearbyPlace);
-              googlePlaceUrl.append("&sensor=true");
-              googlePlaceUrl.append("&key="+"AIzaSyDKNJyIaDzu7oRy84xqlVbOZ99-jCumD3g");
-
-              Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
-
-              return googlePlaceUrl.toString();
-          }
-
-
-
-          @Override
-          public void onLocationChanged(Location location) {
-              latitude = location.getLatitude();
-              longitude = location.getLongitude();
-              lastlocation = location;
-              if(currentLocationmMarker != null)
-              {
-                  currentLocationmMarker.remove();
-
-              }
-              Log.d("lat = ",""+latitude);
-              LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
-              MarkerOptions markerOptions = new MarkerOptions();
-              markerOptions.position(latLng);
-              markerOptions.title("Current Location");
-              markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-              currentLocationmMarker = mMap.addMarker(markerOptions);
-
-//              if(client != null)
-//              {
-//                  fusedLocationClient.getLastLocation().addOnSuccessListener(this, locations -> {
-//                      if (locations != null) {
-//                          latitude = locations.getLatitude();
-//                          longitude = locations.getLongitude();
-//                          txtLocation.setText(String.format(Locale.US, "%s -- %s", latitude, longitude)
-//                          );
-//                      }
-//                  });
-//              } else {
-//                  Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-//              }
-////                  LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
-
-          }
-
-
-          @Override
-          public void onConnected(@Nullable Bundle bundle) {
-              locationRequest = new LocationRequest();
-              locationRequest.setInterval(100);
-              locationRequest.setFastestInterval(1000);
-              locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-
-
-//              if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)
-//              {
-//                  LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
-//              }
-          }
-
-          @Override
-          public void onConnectionSuspended(int i) {
-              Log.d(TAG, "Google Connection Suspended");
-          }
-
-          @Override
-          public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-              Log.e(TAG, "Connection Failed:" + connectionResult.getErrorMessage());
-          }
-
-
-          public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.menu_acctset:
-                Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
-                startActivity(toAcct);
-                break;
-
-            case R.id.menu_famlist:
-//                Intent toList = new Intent(MapActivity.this,FamilyList.class);
-//                startActivity(toList);
-
-                Toast.makeText(this, "Under Construction.", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.menu_logout:
-                Intent toMain = new Intent(MapActivity.this, MainActivity.class);
-                startActivity(toMain);
-                Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return true;
-
-    }
-
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        return false;
-    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -489,40 +248,48 @@ double latitude,longitude;
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
-        mMap.setOnMarkerClickListener(this);
-        bulidGoogleApiClient();
+//        mMap.setOnMarkerClickListener(this);
+        mMap.setOnCircleClickListener(this);
         final LatLng putatan = new LatLng(14.397420, 121.033051);
 
+        final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
 
-            final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
-
-            ValueEventListener postListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Get Post object and use the values to update the UI
-
-                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
 
 
-                        Bundle bundle = getIntent().getExtras();
-                        if(bundle != null) {
-                            double lat1 = bundle.getDouble("lat");
-                            double lon2 = bundle.getDouble("lon");
-
-                            LatLng location = new LatLng(lat1,lon2);
-                            marker = mMap.addMarker(new MarkerOptions()
-                                    .position(location)
-                                    .title("Here")
-                                    .flat(true));
-
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-
-                            mRef.getKey();
+                    Bundle bundle = getIntent().getExtras();
+                    if(bundle != null) {
+                        double lat1 = bundle.getDouble("lat");
+                        double lon2 = bundle.getDouble("lon");
 
 
-                        } else {
-                            System.out.println("Bundle null");
-                        }
+
+                    LatLng location = new LatLng(lat1,lon2);
+                    marker = mMap.addMarker(new MarkerOptions()
+                            .position(location));
+
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+
+                        circle = mMap.addCircle(new CircleOptions()
+                                .center(location)
+                                .radius(100f)
+                                .strokeColor(Color.rgb(216,191,216))
+                                .clickable(true)
+                                .fillColor(Color.TRANSPARENT));
+
+//                        circleBound = FirebaseDatabase.getInstance().getReference("conilocationdata/circles");
+//                        circleBound.push().setValue(latLng);
+
+                    mRef.getKey();
+
+
+                    } else {
+                        System.out.println("Bundle null");
+                    }
 
 
 
@@ -540,7 +307,9 @@ double latitude,longitude;
         };
         mRef.orderByKey().limitToLast(1).addValueEventListener(postListener);
 
-    }
+
+
+}
 
 
 
@@ -551,63 +320,28 @@ double latitude,longitude;
     }
 
 
-          @Override
-          public void onMapClick(LatLng latLng) {
-                markerForGeofence(latLng);
-          }
-
-          Marker geoFenceMarker;
-          private void markerForGeofence(LatLng latLng) {
-            MarkerOptions optionMarker = new MarkerOptions()
-                    .position(latLng)
-                    .title("Geofence Marker");
-
-
-            if (mMap!=null)
-            {
-                if (geoFenceMarker!=null)
-                {
-                    geoFenceMarker.remove();
-                }
-
-                geoFenceMarker = mMap.addMarker(optionMarker);
-            }
-
-          }
-
-          private void removeGeofenceDraw() {
-              Log.d(TAG, "removeGeofenceDraw()");
-              if ( geoFenceMarker != null)
-                  geoFenceMarker.remove();
-              if ( geoFenceLimits != null )
-                  geoFenceLimits.remove();
-          }
-
-
-
-
     //    SMS PERMISSIONS
 
-          private void showRequestPermissionsInfoAlertDialog() {
-              AlertDialog.Builder builder = new AlertDialog.Builder(this);
-              builder.setTitle(R.string.permission_alert_dialog_title);
-              builder.setMessage(R.string.permission_dialog_message);
-              builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-                  @Override
-                  public void onClick(DialogInterface dialog, int which) {
-                      dialog.dismiss();
-                      requestReadAndSendSmsPermission();
-                  }
-              });
-              builder.show();
-          }
+    private void showRequestPermissionsInfoAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.permission_alert_dialog_title);
+        builder.setMessage(R.string.permission_dialog_message);
+        builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                requestReadAndSendSmsPermission();
+            }
+        });
+        builder.show();
+    }
 
-          private boolean hasReadSmsPermission() {
-              return ContextCompat.checkSelfPermission(MapActivity.this,
-                      Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
-                      ContextCompat.checkSelfPermission(MapActivity.this,
-                              Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
-          }
+    private boolean hasReadSmsPermission() {
+        return ContextCompat.checkSelfPermission(MapActivity.this,
+                Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(MapActivity.this,
+                        Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+    }
 
     private void requestReadAndSendSmsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this, Manifest.permission.READ_SMS)) {
@@ -619,22 +353,33 @@ double latitude,longitude;
     }
 
 
-          @Override
-          public void onLocationChanged(Location location) {
-
-          }
-
-          @Override
-          public void onMapClick(LatLng latLng) {
-              circle = mMap.addCircle(new CircleOptions()
-                      .center(latLng)
-                      .radius(100f)
-                      .strokeColor(Color.rgb(216,191,216))
-                      .fillColor(Color.TRANSPARENT));
+    @Override
+    public void onLocationChanged(Location location) {
 
 
-              circleBound = FirebaseDatabase.getInstance().getReference("conilocationdata/circles");
-              circleBound.push().setValue(circle);
 
-          }
-      }
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        entered = mMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(100f)
+                .strokeColor(Color.rgb(255,67,67))
+                .clickable(true)
+                .fillColor(Color.TRANSPARENT));
+
+
+        circleBound = FirebaseDatabase.getInstance().getReference("conilocationdata/circles");
+        circleBound.push().setValue(latLng);
+
+
+    }
+
+
+    @Override
+    public void onCircleClick(Circle circle) {
+        circle.remove();
+    }
+}

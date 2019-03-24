@@ -10,12 +10,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
@@ -32,7 +34,7 @@ import java.util.HashMap;
 public class SmsReceiver extends BroadcastReceiver {
 
     DatabaseReference databaseLocation;
-    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
+    HashMapList coordslist = new HashMapList();
     Context context;
 
     @Override
@@ -101,7 +103,7 @@ public class SmsReceiver extends BroadcastReceiver {
         String[] separatedSMS = message.split("\\s+");
         String needHelp = "I NEED HELP";
 
-//        if (senderNumber.equals("+639959315552") && message.contains("LATITUDE:")) {
+        if (senderNumber.equals("+639959947799") && message.contains("LATITUDE:")) {
             DatabaseReference mRef = databaseLocation.push();
             double latitudedb = Double.parseDouble(separatedSMS[1]);
             double longitudedb = Double.parseDouble(separatedSMS[3]);
@@ -116,6 +118,8 @@ public class SmsReceiver extends BroadcastReceiver {
 //            mRef.setValue(data);
 
 //            HashMap<String,Double> coordinates = new HashMap<String,Double>();
+
+            HashMap<String, Double> coordinates = new HashMap<String, Double>();
             coordinates.put("latitude", latitudedb);
             coordinates.put("longitude", longitudedb);
             mRef.setValue(coordinates);
@@ -123,18 +127,25 @@ public class SmsReceiver extends BroadcastReceiver {
             Double lcoords = coordinates.get("latitude");
             Double lcoords2 = coordinates.get("longitude");
 
-
             mRef.getKey();
 
             System.out.println(lcoords);
             System.out.println(lcoords2);
+
+            coordinates.entrySet();
+
 
             Intent toMap = new Intent(context, MapActivity.class);
             toMap.putExtra("lat", lcoords);
             toMap.putExtra("lon", lcoords2);
             toMap.putExtras(toMap);
             context.startActivity(toMap);
-//        }
+
+
+            System.out.println(coordslist);
+
+
+        }
 
 //        if (senderNumber.equals("+639959315552") && message.equals(needHelp)) {
 //
