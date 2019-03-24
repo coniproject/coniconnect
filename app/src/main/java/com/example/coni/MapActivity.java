@@ -87,10 +87,17 @@ import java.util.Map;
 import static android.graphics.Color.rgb;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
+<<<<<<< HEAD
         LocationListener,
         GoogleMap.OnMapClickListener,
         GoogleMap.OnCircleClickListener
 {
+=======
+//        LocationListener,
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnMapClickListener
+      {
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     //Map Access
     private GoogleMap mMap;
@@ -107,11 +114,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private GoogleApiClient client;
     private GeofencingClient geofencingClient;
     private LocationRequest locationRequest;
-    private Marker currentLocationmMarker;
+   // private Marker currentLocationmMarker;
     private Location lastlocation;
 
+<<<<<<< HEAD
     public static final int REQUEST_LOCATION_CODE=99;
     int PROXIMITY_RADIUS=10000;
+=======
+          public static final int REQUEST_LOCATION_CODE=99;
+          int PROXIMITY_RADIUS=10000;
+    LatLng latLngStart;
+
+          private PendingIntent geoFencePendingIntent;
+          public final int GEOFENCE_REQ_CODE = 0;
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     Circle circle,entered,exit;
     DatabaseReference circleBound;
@@ -136,6 +152,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+<<<<<<< HEAD
+=======
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -241,6 +264,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+<<<<<<< HEAD
+=======
+
+
+
+
+          public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.menu_acctset:
+                Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
+                startActivity(toAcct);
+                break;
+
+            case R.id.menu_famlist:
+//                Intent toList = new Intent(MapActivity.this,FamilyList.class);
+//                startActivity(toList);
+
+                Toast.makeText(this, "Under Construction.", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.menu_logout:
+                Intent toMain = new Intent(MapActivity.this, MainActivity.class);
+                startActivity(toMain);
+                Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -248,8 +310,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
+<<<<<<< HEAD
 //        mMap.setOnMarkerClickListener(this);
         mMap.setOnCircleClickListener(this);
+=======
+        mMap.setOnMarkerClickListener(this);
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
         final LatLng putatan = new LatLng(14.397420, 121.033051);
 
         final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
@@ -320,7 +386,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+<<<<<<< HEAD
     //    SMS PERMISSIONS
+=======
+//          @Override
+//          public void onMapClick(LatLng latLng) {
+//                markerForGeofence(latLng);
+//          }
+
+          Marker geoFenceMarker;
+          private void markerForGeofence(LatLng latLng) {
+            MarkerOptions optionMarker = new MarkerOptions()
+                    .position(latLng)
+                    .title("Geofence Marker");
+
+
+            if (mMap!=null)
+            {
+                if (geoFenceMarker!=null)
+                {
+                    geoFenceMarker.remove();
+                }
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     private void showRequestPermissionsInfoAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -336,12 +423,51 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         builder.show();
     }
 
+<<<<<<< HEAD
     private boolean hasReadSmsPermission() {
         return ContextCompat.checkSelfPermission(MapActivity.this,
                 Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(MapActivity.this,
                         Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
     }
+=======
+          }
+
+          private void removeGeofenceDraw() {
+              Log.d(TAG, "removeGeofenceDraw()");
+              if ( geoFenceMarker != null)
+                  geoFenceMarker.remove();
+//              if ( geoFenceLimits != null )
+//                  geoFenceLimits.remove();
+          }
+
+
+
+
+    //    SMS PERMISSIONS
+
+          private void showRequestPermissionsInfoAlertDialog() {
+              AlertDialog.Builder builder = new AlertDialog.Builder(this);
+              builder.setTitle(R.string.permission_alert_dialog_title);
+              builder.setMessage(R.string.permission_dialog_message);
+              builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
+                  @Override
+                  public void onClick(DialogInterface dialog, int which) {
+                      dialog.dismiss();
+                      requestReadAndSendSmsPermission();
+                  }
+              });
+              builder.show();
+          }
+
+          private boolean hasReadSmsPermission() {
+              return ContextCompat.checkSelfPermission(MapActivity.this,
+                      Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
+                      ContextCompat.checkSelfPermission(MapActivity.this,
+                              Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
+
+          }
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     private void requestReadAndSendSmsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this, Manifest.permission.READ_SMS)) {
@@ -353,8 +479,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+<<<<<<< HEAD
     @Override
     public void onLocationChanged(Location location) {
+=======
+>>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
 
 
