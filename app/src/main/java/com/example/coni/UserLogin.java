@@ -22,6 +22,7 @@ public class UserLogin extends AppCompatActivity {
 
     DBHelper mydb;
     SQLiteDatabase sqLiteDatabase;
+    private Session session;
 
     private static final int ERROR_DIALOG_REQUEST = 9001;
 
@@ -35,11 +36,16 @@ public class UserLogin extends AppCompatActivity {
         txtpassword = findViewById(R.id.passwordlogin);
 
         //Database
+        session = new Session(this);
 
         mydb = new DBHelper(this);
         login();
 
         //Map Access
+        if(session.loggedin()){
+            startActivity(new Intent(UserLogin.this,MapActivity.class));
+            finish();
+        }
 
 
 
@@ -57,6 +63,7 @@ public class UserLogin extends AppCompatActivity {
                 Cursor res = mydb.userlogin(loginname, loginpword, sqLiteDatabase);
 
                 if (res.moveToFirst()) {
+                    session.setLoggedin(true);
                     Intent intent = new Intent(UserLogin.this, MapActivity.class);
                     startActivity(intent);
 

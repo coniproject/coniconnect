@@ -87,17 +87,10 @@ import java.util.Map;
 import static android.graphics.Color.rgb;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
-<<<<<<< HEAD
         LocationListener,
         GoogleMap.OnMapClickListener,
         GoogleMap.OnCircleClickListener
 {
-=======
-//        LocationListener,
-        GoogleMap.OnMarkerClickListener,
-        GoogleMap.OnMapClickListener
-      {
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     //Map Access
     private GoogleMap mMap;
@@ -105,29 +98,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private DatabaseReference mChild;
     Marker marker;
     private static final String TAG = "UserProfile";
+    public static final String MyPREFERENCES = "myprefs";
     private final Handler handler = new Handler();
     private static final float DEFAULT_ZOOM = 15f;
     SmsReceiver smsReceiver = new SmsReceiver();
 //    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
     HashMapList coordslist = new HashMapList();
+    SharedPreferences sharedPreferences;
+    private Session session;
 
     private GoogleApiClient client;
     private GeofencingClient geofencingClient;
     private LocationRequest locationRequest;
-   // private Marker currentLocationmMarker;
+    private Marker currentLocationmMarker;
     private Location lastlocation;
 
-<<<<<<< HEAD
     public static final int REQUEST_LOCATION_CODE=99;
     int PROXIMITY_RADIUS=10000;
-=======
-          public static final int REQUEST_LOCATION_CODE=99;
-          int PROXIMITY_RADIUS=10000;
-    LatLng latLngStart;
-
-          private PendingIntent geoFencePendingIntent;
-          public final int GEOFENCE_REQ_CODE = 0;
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     Circle circle,entered,exit;
     DatabaseReference circleBound;
@@ -152,13 +139,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-<<<<<<< HEAD
-=======
-        geofencingClient = LocationServices.getGeofencingClient(this);
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
         if (!hasReadSmsPermission()) {
             showRequestPermissionsInfoAlertDialog();
@@ -174,13 +154,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //FLOATING ACTION MENU
 
         fab_menu = findViewById(R.id.fab_nav);
-        fab_nearby = findViewById(R.id.fab_nearbyplaces);
+//        fab_nearby = findViewById(R.id.fab_nearbyplaces);
         fab_home = findViewById(R.id.fab_maphome);
-        fab_hotline = findViewById(R.id.fab_hotline);
-        fab_zones = findViewById(R.id.fab_safezone);
+//        fab_hotline = findViewById(R.id.fab_hotline);
+//        fab_zones = findViewById(R.id.fab_safezone);
         fab_reg = findViewById(R.id.fab_addmember);
 
-        fab_update = findViewById(R.id.fab_update);
+//        fab_update = findViewById(R.id.fab_update);
 
         FabOpen = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
         FabClose = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_close);
@@ -194,37 +174,37 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onClick(View v) {
 
                 if (isOpen) {
-                    fab_nearby.startAnimation(FabClose);
+//                    fab_nearby.startAnimation(FabClose);
                     fab_home.startAnimation(FabClose);
-                    fab_hotline.startAnimation(FabClose);
-                    fab_zones.startAnimation(FabClose);
+//                    fab_hotline.startAnimation(FabClose);
+//                    fab_zones.startAnimation(FabClose);
                     fab_reg.startAnimation(FabClose);
-                    fab_update.startAnimation(FabClose);
+//                    fab_update.startAnimation(FabClose);
                     fab_menu.startAnimation(FabRotateAntiCW);
 
-                    fab_nearby.setClickable(false);
+//                    fab_nearby.setClickable(false);
                     fab_home.setClickable(false);
-                    fab_hotline.setClickable(false);
-                    fab_zones.setClickable(false);
+//                    fab_hotline.setClickable(false);
+//                    fab_zones.setClickable(false);
                     fab_reg.setClickable(false);
-                    fab_update.setClickable(false);
+//                    fab_update.setClickable(false);
                     isOpen = false;
 
                 } else {
-                    fab_nearby.startAnimation(FabOpen);
+//                    fab_nearby.startAnimation(FabOpen);
                     fab_home.startAnimation(FabOpen);
-                    fab_hotline.startAnimation(FabOpen);
-                    fab_zones.startAnimation(FabOpen);
+//                    fab_hotline.startAnimation(FabOpen);
+//                    fab_zones.startAnimation(FabOpen);
                     fab_reg.startAnimation(FabOpen);
-                    fab_update.startAnimation(FabOpen);
+//                    fab_update.startAnimation(FabOpen);
                     fab_menu.startAnimation(FabRotateCW);
 
-                    fab_nearby.setClickable(true);
+//                    fab_nearby.setClickable(true);
                     fab_home.setClickable(true);
-                    fab_hotline.setClickable(true);
-                    fab_zones.setClickable(true);
+//                    fab_hotline.setClickable(true);
+//                    fab_zones.setClickable(true);
                     fab_reg.setClickable(true);
-                    fab_update.setClickable(true);
+//                    fab_update.setClickable(true);
                     isOpen = true;
                 }
 
@@ -246,63 +226,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        fab_update.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent toNearby = new Intent(MapActivity.this, NearbyPlaces.class);
-                startActivity(toNearby);
-            }
-        });
-
-        fab_hotline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent toHotline = new Intent(MapActivity.this, Hotline.class);
-                startActivity(toHotline);
-            }
-        });
-
-    }
-
-<<<<<<< HEAD
-=======
-
-
-
-
-          public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-
-        switch (id) {
-            case R.id.menu_acctset:
-                Intent toAcct = new Intent(MapActivity.this,AccountSettings.class);
-                startActivity(toAcct);
-                break;
-
-            case R.id.menu_famlist:
-//                Intent toList = new Intent(MapActivity.this,FamilyList.class);
-//                startActivity(toList);
-
-                Toast.makeText(this, "Under Construction.", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.menu_logout:
-                Intent toMain = new Intent(MapActivity.this, MainActivity.class);
-                startActivity(toMain);
-                Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return true;
+//        fab_update.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent toNearby = new Intent(MapActivity.this, NearbyPlaces.class);
+//                startActivity(toNearby);
+//            }
+//        });
+//
+//        fab_hotline.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent toHotline = new Intent(MapActivity.this, Hotline.class);
+//                startActivity(toHotline);
+//            }
+//        });
 
     }
 
-    @Override
-    public boolean onMarkerClick(Marker marker) {
-        return false;
-    }
-
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -310,13 +251,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
-<<<<<<< HEAD
 //        mMap.setOnMarkerClickListener(this);
         mMap.setOnCircleClickListener(this);
-=======
-        mMap.setOnMarkerClickListener(this);
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
-        final LatLng putatan = new LatLng(14.397420, 121.033051);
+//        final LatLng putatan = new LatLng(14.397420, 121.033051);
 
         final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
         ValueEventListener postListener = new ValueEventListener() {
@@ -332,25 +269,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         double lat1 = bundle.getDouble("lat");
                         double lon2 = bundle.getDouble("lon");
 
+                        LatLng location = new LatLng(lat1, lon2);
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(location));
 
-
-                    LatLng location = new LatLng(lat1,lon2);
-                    marker = mMap.addMarker(new MarkerOptions()
-                            .position(location));
-
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
 
                         circle = mMap.addCircle(new CircleOptions()
                                 .center(location)
                                 .radius(100f)
-                                .strokeColor(Color.rgb(216,191,216))
+                                .strokeColor(Color.rgb(216, 191, 216))
                                 .clickable(true)
                                 .fillColor(Color.TRANSPARENT));
 
-//                        circleBound = FirebaseDatabase.getInstance().getReference("conilocationdata/circles");
-//                        circleBound.push().setValue(latLng);
 
-                    mRef.getKey();
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
+
+                        mRef.getKey();
 
 
                     } else {
@@ -373,10 +308,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         };
         mRef.orderByKey().limitToLast(1).addValueEventListener(postListener);
 
+    }
 
+    public boolean onOptionsItemSelected (MenuItem item){
 
-}
+        int id = item.getItemId();
 
+        switch (id) {
+
+            case R.id.menu_logout:
+                Intent toMain = new Intent(MapActivity.this, MainActivity.class);
+                startActivity(toMain);
+                Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
+
+    }
 
 
     @Override
@@ -386,28 +334,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-<<<<<<< HEAD
     //    SMS PERMISSIONS
-=======
-//          @Override
-//          public void onMapClick(LatLng latLng) {
-//                markerForGeofence(latLng);
-//          }
-
-          Marker geoFenceMarker;
-          private void markerForGeofence(LatLng latLng) {
-            MarkerOptions optionMarker = new MarkerOptions()
-                    .position(latLng)
-                    .title("Geofence Marker");
-
-
-            if (mMap!=null)
-            {
-                if (geoFenceMarker!=null)
-                {
-                    geoFenceMarker.remove();
-                }
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     private void showRequestPermissionsInfoAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -423,51 +350,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         builder.show();
     }
 
-<<<<<<< HEAD
     private boolean hasReadSmsPermission() {
         return ContextCompat.checkSelfPermission(MapActivity.this,
                 Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(MapActivity.this,
                         Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
     }
-=======
-          }
-
-          private void removeGeofenceDraw() {
-              Log.d(TAG, "removeGeofenceDraw()");
-              if ( geoFenceMarker != null)
-                  geoFenceMarker.remove();
-//              if ( geoFenceLimits != null )
-//                  geoFenceLimits.remove();
-          }
-
-
-
-
-    //    SMS PERMISSIONS
-
-          private void showRequestPermissionsInfoAlertDialog() {
-              AlertDialog.Builder builder = new AlertDialog.Builder(this);
-              builder.setTitle(R.string.permission_alert_dialog_title);
-              builder.setMessage(R.string.permission_dialog_message);
-              builder.setPositiveButton(R.string.action_ok, new DialogInterface.OnClickListener() {
-                  @Override
-                  public void onClick(DialogInterface dialog, int which) {
-                      dialog.dismiss();
-                      requestReadAndSendSmsPermission();
-                  }
-              });
-              builder.show();
-          }
-
-          private boolean hasReadSmsPermission() {
-              return ContextCompat.checkSelfPermission(MapActivity.this,
-                      Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED &&
-                      ContextCompat.checkSelfPermission(MapActivity.this,
-                              Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED;
-
-          }
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
     private void requestReadAndSendSmsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(MapActivity.this, Manifest.permission.READ_SMS)) {
@@ -479,11 +367,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-<<<<<<< HEAD
     @Override
     public void onLocationChanged(Location location) {
-=======
->>>>>>> b32541f88269e795e1413a76da59a8cd8757ddf3
 
 
 

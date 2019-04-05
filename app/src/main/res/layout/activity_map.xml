@@ -61,19 +61,19 @@
         app:pressedTranslationZ="12dp"
         app:borderWidth="0dp" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin_right"
-        android:layout_marginBottom="100dp"
-        android:src="@drawable/pin"
-        android:elevation="6dp"
-        android:id="@+id/fab_nearbyplaces"
-        app:pressedTranslationZ="12dp"
-        android:backgroundTint="@color/fab2_color"
-        android:visibility="invisible"
-        app:borderWidth="0dp"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+        <!--android:layout_marginBottom="100dp"-->
+        <!--android:src="@drawable/pin"-->
+        <!--android:elevation="6dp"-->
+        <!--android:id="@+id/fab_nearbyplaces"-->
+        <!--app:pressedTranslationZ="12dp"-->
+        <!--android:backgroundTint="@color/fab2_color"-->
+        <!--android:visibility="invisible"-->
+        <!--app:borderWidth="0dp"/>-->
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -89,47 +89,47 @@
         android:visibility="invisible"
         app:borderWidth="0dp"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin_right"
-        android:layout_marginBottom="260dp"
-        android:src="@drawable/safezone"
-        android:elevation="6dp"
-        android:id="@+id/fab_safezone"
-        app:pressedTranslationZ="12dp"
-        android:backgroundTint="@color/fab2_color"
-        android:visibility="invisible"
-        app:borderWidth="0dp"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+        <!--android:layout_marginBottom="260dp"-->
+        <!--android:src="@drawable/safezone"-->
+        <!--android:elevation="6dp"-->
+        <!--android:id="@+id/fab_safezone"-->
+        <!--app:pressedTranslationZ="12dp"-->
+        <!--android:backgroundTint="@color/fab2_color"-->
+        <!--android:visibility="invisible"-->
+        <!--app:borderWidth="0dp"/>-->
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin_right"
-        android:layout_marginBottom="330dp"
-        android:src="@drawable/exclamation"
-        android:elevation="6dp"
-        android:id="@+id/fab_update"
-        app:pressedTranslationZ="12dp"
-        android:backgroundTint="@color/fab2_color"
-        android:visibility="invisible"
-        app:borderWidth="0dp"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+        <!--android:layout_marginBottom="330dp"-->
+        <!--android:src="@drawable/exclamation"-->
+        <!--android:elevation="6dp"-->
+        <!--android:id="@+id/fab_update"-->
+        <!--app:pressedTranslationZ="12dp"-->
+        <!--android:backgroundTint="@color/fab2_color"-->
+        <!--android:visibility="invisible"-->
+        <!--app:borderWidth="0dp"/>-->
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin_right"
-        android:layout_marginBottom="400dp"
-        android:src="@drawable/hotlinesuggestions"
-        android:elevation="6dp"
-        android:id="@+id/fab_hotline"
-        app:pressedTranslationZ="12dp"
-        android:backgroundTint="@color/fab2_color"
-        android:visibility="invisible"
-        app:borderWidth="0dp"/>
+    <!--<android.support.design.widget.FloatingActionButton-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:layout_marginRight="@dimen/fab_margin_right"-->
+        <!--android:layout_marginBottom="400dp"-->
+        <!--android:src="@drawable/hotlinesuggestions"-->
+        <!--android:elevation="6dp"-->
+        <!--android:id="@+id/fab_hotline"-->
+        <!--app:pressedTranslationZ="12dp"-->
+        <!--android:backgroundTint="@color/fab2_color"-->
+        <!--android:visibility="invisible"-->
+        <!--app:borderWidth="0dp"/>-->
 
     <android.support.design.widget.FloatingActionButton
     android:layout_width="wrap_content"

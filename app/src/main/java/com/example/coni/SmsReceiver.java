@@ -31,11 +31,16 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class SmsReceiver extends BroadcastReceiver {
 
     DatabaseReference databaseLocation;
     HashMapList coordslist = new HashMapList();
     Context context;
+    SharedPreferences sharedPreferences;
+    public Double lcoords, lcoords2;
+    public static final String MyPREFERENCES = "myprefs";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -105,8 +110,11 @@ public class SmsReceiver extends BroadcastReceiver {
 
         if (senderNumber.equals("+639959947799") && message.contains("LATITUDE:")) {
             DatabaseReference mRef = databaseLocation.push();
-            double latitudedb = Double.parseDouble(separatedSMS[1]);
-            double longitudedb = Double.parseDouble(separatedSMS[3]);
+            Double latitudedb = Double.parseDouble(separatedSMS[1]);
+            Double longitudedb = Double.parseDouble(separatedSMS[3]);
+
+//            String latitudedb = separatedSMS[1];
+//            String longitudedb = separatedSMS[3];
 
 
 //            LocationArray locationArray = new LocationArray(mydate,senderNumber,latitudedb,longitudedb);
@@ -124,8 +132,8 @@ public class SmsReceiver extends BroadcastReceiver {
             coordinates.put("longitude", longitudedb);
             mRef.setValue(coordinates);
 
-            Double lcoords = coordinates.get("latitude");
-            Double lcoords2 = coordinates.get("longitude");
+           lcoords = coordinates.get("latitude");
+           lcoords2 = coordinates.get("longitude");
 
             mRef.getKey();
 
@@ -145,6 +153,10 @@ public class SmsReceiver extends BroadcastReceiver {
             System.out.println(coordslist);
 
 
+//            SharedPreferences.Editor editor = sharedPreferences.edit();
+//            editor.putString("latitude",lcoords);
+//            editor.putString("longitude",lcoords2);
+//            editor.apply();
         }
 
 //        if (senderNumber.equals("+639959315552") && message.equals(needHelp)) {

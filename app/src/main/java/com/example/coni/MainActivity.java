@@ -12,12 +12,15 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     Button btnlogin, btnsignup;
+    private Session session;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        session = new Session(this);
 
 
         btnlogin = findViewById(R.id.btn_login);

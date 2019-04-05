@@ -171,14 +171,14 @@ public class Guardianreg extends AppCompatActivity {
                     Intent toLogin = new Intent(Guardianreg.this, UserLogin.class);
                     startActivity(toLogin);
 
-                    edtlastname.setText("");
-                    edtfirstname.setText("");
-                    edtmidname.setText("");
-                    edtemail.setText("");
-                    edtuname.setText("");
-                    edtcontactno.setText("");
-                    edtpass.setText("");
-                    edtbday.setText("");
+//                    edtlastname.setText("");
+//                    edtfirstname.setText("");
+//                    edtmidname.setText("");
+//                    edtemail.setText("");
+//                    edtuname.setText("");
+//                    edtcontactno.setText("");
+//                    edtpass.setText("");
+//                    edtbday.setText("");
                 }
                 else{
                     Toast.makeText(Guardianreg.this, "Please fill up all the required fields.", Toast.LENGTH_SHORT).show();
