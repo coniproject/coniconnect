@@ -283,7 +283,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     LatLng location = new LatLng(lat,lon);
                     geofenceMarker = mMap.addMarker(new MarkerOptions()
-                        .position(location)
+                        .position(location).title("Current Device Location")
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
 
                     DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference("smsdata");
@@ -324,7 +324,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             case R.id.add_boundary:
                 startGeofence();
-                marker.remove();
+                marker.setTitle("Safe Zone");
                 return true;
 
             case R.id.cleardata:
