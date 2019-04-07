@@ -67,7 +67,7 @@ public class SmsReceiver extends BroadcastReceiver {
                 String message = sms.getMessageBody();
 
 
-                    Toast.makeText(context, senderNumber + message, Toast.LENGTH_LONG).show();
+//                    Toast.makeText(context, senderNumber + message, Toast.LENGTH_LONG).show();
 
 //                    sendSMStoSQLiteDatabase(sms, context);
 

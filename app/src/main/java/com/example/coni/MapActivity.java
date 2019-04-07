@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +20,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -89,6 +92,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.graphics.Color.TRANSPARENT;
 import static android.graphics.Color.rgb;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -279,7 +283,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                     LatLng location = new LatLng(lat,lon);
                     geofenceMarker = mMap.addMarker(new MarkerOptions()
-                        .position(location));
+                        .position(location)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+
+                    DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference("smsdata");
+                    DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference("markeronmap");
+
+                    ref1.orderByChild("smsdata").equalTo("latitude");
+                    ref2.orderByChild("markeronmap").equalTo("latitude");
+
+                    if(!ref2.child("latitude").equals(ref1.child("latitude"))){
+                        Toast.makeText(MapActivity.this,"CHILD OUT OF RANGE", Toast.LENGTH_LONG).show();
+                    }
+
+//                    if(ref2.child("latitude").equals(ref1.child("latitude"))) {
+//                        Toast.makeText(MapActivity.this, "CHILD IS INSIDE SAFE ZONE.", Toast.LENGTH_LONG).show();
+//                    }
 
 
 
@@ -391,7 +410,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         circle = mMap.addCircle(new CircleOptions()
                 .center(marker.getPosition())
                 .radius(100f)
-                .strokeColor(Color.rgb(240,128,128))
+                .strokeColor(Color.rgb(218,112,214))
                 .clickable(true)
                 .fillColor(Color.TRANSPARENT));
     }
