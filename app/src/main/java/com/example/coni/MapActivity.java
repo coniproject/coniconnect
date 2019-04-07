@@ -94,7 +94,8 @@ import static android.graphics.Color.rgb;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
         LocationListener,
         GoogleMap.OnMapClickListener,
-        GoogleMap.OnMarkerClickListener
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnCircleClickListener
 {
 
     //Map Access
@@ -261,7 +262,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
-        mMap.setOnMarkerClickListener(this);
+//        mMap.setOnMarkerClickListener(this);
 
         LatLng latLng = new LatLng(14.397420, 121.033051);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -279,6 +280,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     LatLng location = new LatLng(lat,lon);
                     geofenceMarker = mMap.addMarker(new MarkerOptions()
                         .position(location));
+
+
+
 
                 }
             }
@@ -301,16 +305,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             case R.id.add_boundary:
                 startGeofence();
+                marker.remove();
                 return true;
 
+            case R.id.cleardata:
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("smsdata");
+                databaseReference.removeValue();
+                Intent toMap = new Intent(MapActivity.this,MapActivity.class);
+                startActivity(toMap);
+                return true;
             case R.id.menu_logout:
                 Intent toMain = new Intent(MapActivity.this, MainActivity.class);
                 startActivity(toMain);
                 Toast.makeText(MapActivity.this, "Disconnected.", Toast.LENGTH_SHORT).show();
                 break;
+
         }
         return true;
-
     }
 
 
@@ -387,7 +398,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        marker.remove();
         return true;
+    }
+
+    @Override
+    public void onCircleClick(Circle circle) {
+        circle.remove();
     }
 }

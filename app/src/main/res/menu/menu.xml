@@ -12,13 +12,18 @@
         android:title="@string/add_boundary"
         android:id="@+id/add_boundary">
     </item>
-    <!--<item-->
-        <!--android:title="@string/acctset"-->
-        <!--android:id="@+id/menu_acctset">-->
-        <!--</item>-->
+    <item
+        android:title="@string/refreshmap"
+        android:id="@+id/cleardata">
+    </item>
+    <item
+        android:title="@string/acctset"
+        android:id="@+id/menu_acctset">
+        </item>
 
     <item   android:title="@string/logout"
         android:id="@+id/menu_logout">
 
     </item>
+
 </menu>

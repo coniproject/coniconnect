@@ -30,5 +30,6 @@
     <string name="permission_dialog_message">By clicking OK, CONi will be allowed to read incoming SMS from the Child Device solely for alert and safety purposes.</string>
     <string name="my_family">My Family</string>
     <string name="add_boundary">Add Boundary</string>
+    <string name="refreshmap">Clear Map Data</string>
 
 </resources>
