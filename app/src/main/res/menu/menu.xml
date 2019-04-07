@@ -8,10 +8,10 @@
         <!--app:showAsAction="always">-->
     <!--</item>-->
 
-    <!--<item-->
-        <!--android:title="@string/my_family"-->
-        <!--android:id="@+id/menu_famlist">-->
-    <!--</item>-->
+    <item
+        android:title="@string/add_boundary"
+        android:id="@+id/add_boundary">
+    </item>
     <!--<item-->
         <!--android:title="@string/acctset"-->
         <!--android:id="@+id/menu_acctset">-->

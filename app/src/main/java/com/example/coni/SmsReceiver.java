@@ -21,6 +21,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.SmsMessage;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -28,10 +29,14 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
+import static android.support.constraint.Constraints.TAG;
 
 public class SmsReceiver extends BroadcastReceiver {
 
@@ -41,6 +46,9 @@ public class SmsReceiver extends BroadcastReceiver {
     SharedPreferences sharedPreferences;
     public Double lcoords, lcoords2;
     public static final String MyPREFERENCES = "myprefs";
+    public ArrayList<Double> locationcoords = new ArrayList<Double>();
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -100,10 +108,10 @@ public class SmsReceiver extends BroadcastReceiver {
     public void sendDataToFirebase(SmsMessage sms, Context context) {
 
         FirebaseApp.initializeApp(context);
-        databaseLocation = FirebaseDatabase.getInstance().getReference("conilocationdata");
+        databaseLocation = FirebaseDatabase.getInstance().getReference("smsdata");
 
         String senderNumber = sms.getOriginatingAddress();
-        String mydate = java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
+        String mydate = DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
         String message = sms.getMessageBody();
         String[] separatedSMS = message.split("\\s+");
         String needHelp = "I NEED HELP";
@@ -113,56 +121,54 @@ public class SmsReceiver extends BroadcastReceiver {
             Double latitudedb = Double.parseDouble(separatedSMS[1]);
             Double longitudedb = Double.parseDouble(separatedSMS[3]);
 
+
+
 //            String latitudedb = separatedSMS[1];
 //            String longitudedb = separatedSMS[3];
 
 
-//            LocationArray locationArray = new LocationArray(mydate,senderNumber,latitudedb,longitudedb);
-//            databaseLocation.child("conilocationdata").push().setValue(locationArray);
+            LocationArray locationArray = new LocationArray(latitudedb,longitudedb);
+            databaseLocation.push().setValue(locationArray);
 
 //            HashMap<String, String> data = new HashMap<String, String>();
 //            data.put("date", mydate);
 //            data.put("recipient", senderNumber);
 //            mRef.setValue(data);
 
-//            HashMap<String,Double> coordinates = new HashMap<String,Double>();
 
             HashMap<String, Double> coordinates = new HashMap<String, Double>();
             coordinates.put("latitude", latitudedb);
             coordinates.put("longitude", longitudedb);
             mRef.setValue(coordinates);
 
-           lcoords = coordinates.get("latitude");
-           lcoords2 = coordinates.get("longitude");
-
-            mRef.getKey();
-
-            System.out.println(lcoords);
-            System.out.println(lcoords2);
-
-            coordinates.entrySet();
-
-
-            Intent toMap = new Intent(context, MapActivity.class);
-            toMap.putExtra("lat", lcoords);
-            toMap.putExtra("lon", lcoords2);
-            toMap.putExtras(toMap);
-            context.startActivity(toMap);
-
-
-            System.out.println(coordslist);
-
-
-//            SharedPreferences.Editor editor = sharedPreferences.edit();
-//            editor.putString("latitude",lcoords);
-//            editor.putString("longitude",lcoords2);
-//            editor.apply();
-        }
-
-//        if (senderNumber.equals("+639959315552") && message.equals(needHelp)) {
+//            locationcoords.add(latitudedb);
+//            locationcoords.add(longitudedb);
 //
-//        }
+//            double lat = locationcoords.get(0);
+//            double lon = locationcoords.get(1);
+//            System.out.println(lat);
+//            System.out.println(lon);
 
+
+//           lcoords = coordinates.get("latitude");
+//           lcoords2 = coordinates.get("longitude");
+
+//            mRef.getKey();
+//
+//            System.out.println(lcoords);
+//            System.out.println(lcoords2);
+//
+//            coordinates.entrySet();
+
+
+//            Intent toMap = new Intent(context, MapActivity.class);
+//            toMap.putExtra("lat", lcoords);
+//            toMap.putExtra("lon", lcoords2);
+//            toMap.putExtras(toMap);
+//            context.startActivity(toMap);
+
+
+        }
 
 
      }

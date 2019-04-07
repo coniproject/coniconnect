@@ -3,6 +3,7 @@ package com.example.coni;
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,12 +12,14 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Camera;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
+import android.renderscript.Sampler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -79,7 +82,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,20 +94,20 @@ import static android.graphics.Color.rgb;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback,
         LocationListener,
         GoogleMap.OnMapClickListener,
-        GoogleMap.OnCircleClickListener
+        GoogleMap.OnMarkerClickListener
 {
 
     //Map Access
     private GoogleMap mMap;
     private ChildEventListener mChildEventListener;
     private DatabaseReference mChild;
-    Marker marker;
+    Marker marker, geofenceMarker;
     private static final String TAG = "UserProfile";
     public static final String MyPREFERENCES = "myprefs";
     private final Handler handler = new Handler();
     private static final float DEFAULT_ZOOM = 15f;
     SmsReceiver smsReceiver = new SmsReceiver();
-//    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
+    //    private HashMap<String, Double> coordinates = new HashMap<String, Double>();
     HashMapList coordslist = new HashMapList();
     SharedPreferences sharedPreferences;
     private Session session;
@@ -116,11 +121,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public static final int REQUEST_LOCATION_CODE=99;
     int PROXIMITY_RADIUS=10000;
 
-    Circle circle,entered,exit;
+    Circle circle,entered,onMapCircle;
     DatabaseReference circleBound;
 
     //SMS
     private static final int SMS_PERMISSION_CODE = 0;
+    DatabaseReference getData = FirebaseDatabase.getInstance().getReference("smsdata");
 
     //Floating Action Button
 
@@ -222,6 +228,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         fab_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                finish();
+                overridePendingTransition(0, 0);
+                startActivity(getIntent());
+                overridePendingTransition(0, 0);
 
             }
         });
@@ -251,62 +261,35 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(15.0f);
         mMap.setMaxZoomPreference(20.0f);
         mMap.setOnMapClickListener(this);
-//        mMap.setOnMarkerClickListener(this);
-        mMap.setOnCircleClickListener(this);
-//        final LatLng putatan = new LatLng(14.397420, 121.033051);
+        mMap.setOnMarkerClickListener(this);
 
-        final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("conilocationdata");
-        ValueEventListener postListener = new ValueEventListener() {
+        LatLng latLng = new LatLng(14.397420, 121.033051);
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        final DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("smsdata");
+        ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    LocationArray locationArray = dataSnapshot1.getValue(LocationArray.class);
+                    double lat = locationArray.getLatitudedb();
+                    double lon = locationArray.getLongitudedb();
 
-
-                    Bundle bundle = getIntent().getExtras();
-                    if(bundle != null) {
-                        double lat1 = bundle.getDouble("lat");
-                        double lon2 = bundle.getDouble("lon");
-
-                        LatLng location = new LatLng(lat1, lon2);
-                        marker = mMap.addMarker(new MarkerOptions()
-                                .position(location));
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-
-                        circle = mMap.addCircle(new CircleOptions()
-                                .center(location)
-                                .radius(100f)
-                                .strokeColor(Color.rgb(216, 191, 216))
-                                .clickable(true)
-                                .fillColor(Color.TRANSPARENT));
-
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(location));
-
-                        mRef.getKey();
-
-
-                    } else {
-                        System.out.println("Bundle null");
-                    }
-
-
+                    LatLng location = new LatLng(lat,lon);
+                    geofenceMarker = mMap.addMarker(new MarkerOptions()
+                        .position(location));
 
                 }
-
-
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                // ...
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         };
-        mRef.orderByKey().limitToLast(1).addValueEventListener(postListener);
+
+        mRef.orderByKey().limitToLast(1).addValueEventListener(valueEventListener);
 
     }
 
@@ -315,6 +298,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         int id = item.getItemId();
 
         switch (id) {
+
+            case R.id.add_boundary:
+                startGeofence();
+                return true;
 
             case R.id.menu_logout:
                 Intent toMain = new Intent(MapActivity.this, MainActivity.class);
@@ -377,23 +364,30 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {
 
-        entered = mMap.addCircle(new CircleOptions()
-                .center(latLng)
-                .radius(100f)
-                .strokeColor(Color.rgb(255,67,67))
-                .clickable(true)
-                .fillColor(Color.TRANSPARENT));
 
+        marker = mMap.addMarker(new MarkerOptions()
+            .position(latLng)
+            .draggable(true));
 
-        circleBound = FirebaseDatabase.getInstance().getReference("conilocationdata/circles");
-        circleBound.push().setValue(latLng);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("markeronmap");
+        reference.push().setValue(latLng);
 
 
     }
 
+    public void startGeofence() {
+
+        circle = mMap.addCircle(new CircleOptions()
+                .center(marker.getPosition())
+                .radius(100f)
+                .strokeColor(Color.rgb(240,128,128))
+                .clickable(true)
+                .fillColor(Color.TRANSPARENT));
+    }
 
     @Override
-    public void onCircleClick(Circle circle) {
-        circle.remove();
+    public boolean onMarkerClick(Marker marker) {
+        marker.remove();
+        return true;
     }
 }
